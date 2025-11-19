@@ -1,0 +1,73 @@
+{
+  "expo": {
+    "name": "Grociko",
+    "slug": "grociko",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "grociko",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.smartwebin.grociko"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-navigation-bar",
+        {
+          "backgroundColor": "#000000",
+          "barStyle": "light",
+          "borderColor": "#000000",
+          "visibility": "visible",
+          "behavior": "inset-swipe",
+          "position": "relative"
+        }
+      ],
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "resizeMode": "contain",
+          "backgroundColor": "#ea8732",
+          "dark": {
+            "backgroundColor": "#ea8732"
+          }
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "expo-navigation-bar": {
+        "backgroundColor": "#000000",
+        "barStyle": "light",
+        "borderColor": "#000000",
+        "visibility": "visible",
+        "behavior": "inset-swipe",
+        "position": "relative"
+      },
+      "eas": {
+        "projectId": "15fc78d9-0643-41ee-ac38-f7b0bdfb01bd"
+      }
+    }
+  }
+}
