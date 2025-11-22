@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     width: screenWidth,
     height: BANNER_HEIGHT + theme.spacing['2xl'],
     alignSelf: "center",
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   slide: {
     flex: 1,

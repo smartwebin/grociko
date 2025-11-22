@@ -43,10 +43,17 @@
         "expo-splash-screen",
         {
           "image": "./assets/company/lgo.png",
-          "imageWidth": 200,
           "resizeMode": "contain",
+          "imageWidth": 220,
           "backgroundColor": "#ea8732",
-          "dark": { "backgroundColor": "#ea8732" }
+          "android": {
+            "resizeMode": "contain",
+            "imageWidth": 220
+          },
+          "ios": {
+            "resizeMode": "contain",
+            "imageWidth": 220
+          }
         }
       ],
       "expo-secure-store"

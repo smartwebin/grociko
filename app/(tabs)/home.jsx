@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   // Search Styles
   searchContainer: {
     // paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
+    marginBottom: theme.spacing.sm,
   },
   searchBar: {
     flexDirection: "row",
