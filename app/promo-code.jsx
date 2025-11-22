@@ -189,8 +189,6 @@ const PromoCode = () => {
           </View>
         </View>
 
-        {/* Corner Decoration */}
-        <View style={styles.cornerDecoration} />
       </TouchableOpacity>
     );
   };
@@ -604,22 +602,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-SemiBold",
     color: theme.colors.text.white,
   },
-  cornerDecoration: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: 0,
-    height: 0,
-    borderStyle: "solid",
-    borderTopWidth: 30,
-    borderRightWidth: 30,
-    borderBottomWidth: 0,
-    borderLeftWidth: 0,
-    borderTopColor: theme.colors.primary[100],
-    borderRightColor: "transparent",
-    borderBottomColor: "transparent",
-    borderLeftColor: "transparent",
-  },
+  
 
   // Empty State
   emptyState: {

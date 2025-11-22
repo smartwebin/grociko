@@ -90,14 +90,14 @@ const Home = () => {
   };
 
   // Fetch all data every time screen comes into focus
-useFocusEffect(
-  useCallback(() => {
-    fetchHomeData();
+  useFocusEffect(
+    useCallback(() => {
+      fetchHomeData();
 
-    // Optional cleanup (runs when leaving screen)
-    return () => {};
-  }, [])
-);
+      // Optional cleanup (runs when leaving screen)
+      return () => {};
+    }, [])
+  );
 
   const fetchHomeData = async () => {
     try {
@@ -264,6 +264,14 @@ useFocusEffect(
     router.push(`/search?brand_id=${brand.id}`);
   };
 
+  const handleProfilePress = () => {
+    if (isAuthenticated) {
+      router.push("/my-details");
+    } else {
+      router.push("/(auth)/signin");
+    }
+  };
+
   const renderProductCard = ({ item }) => (
     <ProductCard item={item} onPress={handleProductPress} />
   );
@@ -341,13 +349,7 @@ useFocusEffect(
               {/* Profile Section */}
               <TouchableOpacity
                 style={styles.profileSection}
-                onPress={() => {
-                  if (isAuthenticated) {
-                    router.push("/my-details");
-                  } else {
-                    router.push("/(auth)/signin");
-                  }
-                }}
+                onPress={handleProfilePress}
               >
                 <Image
                   source={

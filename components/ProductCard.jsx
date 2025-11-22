@@ -11,8 +11,10 @@ const ProductCard = ({ item, onPress }) => {
   const handleAddToCart = () => {
     const cartProduct = {
       ...item,
+      unit:item.weight ? item.weight : item.unit,
       availableStock: item.quantity,
     };
+    // console.log("cartProduct",cartProduct)
     addToCart(cartProduct, 1);
   };
 

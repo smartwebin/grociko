@@ -1779,5 +1779,46 @@ export const forgotPassword = async (email) => {
     };
   }
 };
+
+export const deleteUser = async (userId) => {
+  try {
+    const formData = new FormData();
+    formData.append("user_id", userId);
+
+    const headers = {
+      Authorization: getBasicAuthHeader(),
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+    };
+
+    console.log("🗑 Deleting user (soft delete)");
+
+    const response = await makeRequest("/delete-user.php", {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+
+    console.log("response data", response);
+    if (response.success && response.data?.response_code === 200) {
+      return {
+        success: true,
+        message: response.data?.message || "User deleted successfully",
+      };
+    } else {
+      return {
+        success: false,
+        error:
+          response.data?.data?.err?.join(", ") ||
+          response.error ||
+          "Failed to delete user",
+      };
+    }
+  } catch (error) {
+    console.error("❌ Delete User Error:", error);
+    return handleApiError(error, "/delete-user.php");
+  }
+};
+
 export { STORAGE_KEYS };
 

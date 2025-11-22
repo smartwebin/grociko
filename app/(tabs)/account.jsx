@@ -1,13 +1,12 @@
 import SafeAreaWrapper from "@/components/SafeAreaWrapper";
 import { useCart } from "@/providers/CartProvider";
 import { useUser } from "@/providers/UserProvider";
-import { clearUserData, getUserData } from "@/services/apiService";
+import { deleteUser } from "@/services/apiService";
 import theme from "@/utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -18,35 +17,25 @@ import {
 } from "react-native";
 
 const Account = () => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const { clearCart } = useCart(); // Import cart context to clear on logout
-  const { user, isAuthenticated, getUserImage } = useUser();
+  const { clearCart } = useCart();
+  const { user, isAuthenticated, getUserImage, logoutUser } = useUser();
 
   // Check authentication status when screen is focused
   useFocusEffect(
     useCallback(() => {
       checkAuthStatus();
-    }, [])
+    }, [isAuthenticated])
   );
 
-  const checkAuthStatus = async () => {
-    try {
-      setLoading(true);
-      const user = await getUserData();
-      // console.log("User data loaded:", user);
-      if (!user) {
-        // User not logged in, redirect to sign in
-        router.replace("/signin");
-        return;
-      }
+  // Also check when component mounts and when isAuthenticated changes
+  useEffect(() => {
+    checkAuthStatus();
+  }, [isAuthenticated]);
 
-      setUserData(user);
-    } catch (error) {
-      console.error("Error checking auth status:", error);
+  const checkAuthStatus = () => {
+    if (!isAuthenticated || !user) {
+      // User not logged in, redirect to sign in
       router.replace("/signin");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -64,22 +53,68 @@ const Account = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              // Clear user data from SecureStore
-              await clearUserData();
+              // Use the logoutUser from context
+              const result = await logoutUser();
 
-              // Clear cart data
-              clearCart();
+              if (result.success) {
+                // Clear cart data
+                clearCart();
 
-              // Show success message
-              Alert.alert("Success", "You have been signed out successfully.", [
-                {
-                  text: "OK",
-                  onPress: () => router.replace("/signin"),
-                },
-              ]);
+                // Navigate to signin
+                router.replace("/signin");
+              } else {
+                Alert.alert("Error", "Failed to sign out. Please try again.");
+              }
             } catch (error) {
               console.error("Logout error:", error);
               Alert.alert("Error", "Failed to sign out. Please try again.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              if (!user?.id) {
+                Alert.alert("Error", "Unable to find user account.");
+                return;
+              }
+
+              const response = await deleteUser(user.id);
+
+              if (response.success) {
+                // Use logoutUser to clear everything
+                await logoutUser();
+                clearCart();
+
+                Alert.alert(
+                  "Account Deleted",
+                  "Your account has been deleted.",
+                  [{ text: "OK", onPress: () => router.replace("/signin") }]
+                );
+              } else {
+                Alert.alert(
+                  "Error",
+                  response.error || "Failed to delete account"
+                );
+              }
+            } catch (error) {
+              console.error("Delete account error:", error);
+              Alert.alert("Error", "Unexpected error occurred.");
             }
           },
         },
@@ -124,7 +159,7 @@ const Account = () => {
       icon: "help-circle-outline",
       onPress: () => router.push("/help"),
     },
-    
+
     {
       id: 7,
       title: "About",
@@ -173,20 +208,8 @@ const Account = () => {
     </TouchableOpacity>
   );
 
-  // Show loading indicator while checking auth
-  if (loading) {
-    return (
-      <SafeAreaWrapper>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary.main} />
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
-      </SafeAreaWrapper>
-    );
-  }
-
-  // If no user data after loading, don't render anything (will redirect)
-  if (!userData) {
+  // If not authenticated, don't render (will redirect)
+  if (!isAuthenticated || !user) {
     return null;
   }
 
@@ -197,7 +220,7 @@ const Account = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Account</Text>
         </View>
-{/* {console.log("Rendering Account with userData:", getUserImage())} */}
+
         {/* Profile Section */}
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
@@ -212,9 +235,9 @@ const Account = () => {
             />
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.userName}>{userData.name || "User"}</Text>
+            <Text style={styles.userName}>{user.name || "User"}</Text>
             <Text style={styles.userEmail}>
-              {userData.email || userData.phone || "No email"}
+              {user.email || user.phone || "No email"}
             </Text>
           </View>
           <TouchableOpacity
@@ -243,6 +266,26 @@ const Account = () => {
             <Text style={styles.logoutText}>Sign Out</Text>
           </View>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.logoutButton,
+            { borderColor: theme.colors.status.error },
+          ]}
+          onPress={handleDeleteAccount}
+        >
+          <View style={styles.logoutContent}>
+            <Ionicons
+              name="trash-outline"
+              size={24}
+              color={theme.colors.status.error}
+            />
+            <Text
+              style={[styles.logoutText, { color: theme.colors.status.error }]}
+            >
+              Delete Account
+            </Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaWrapper>
   );
@@ -253,20 +296,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background.primary,
     paddingHorizontal: theme.spacing.lg,
-  },
-
-  // Loading Styles
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: theme.colors.background.primary,
-  },
-  loadingText: {
-    marginTop: theme.spacing.lg,
-    fontSize: theme.typography.fontSize.base,
-    fontFamily: "Outfit-Regular",
-    color: theme.colors.text.secondary,
   },
 
   // Header Styles

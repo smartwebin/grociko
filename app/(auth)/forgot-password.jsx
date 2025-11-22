@@ -5,16 +5,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
-    Animated,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const ForgotPassword = () => {
@@ -87,7 +87,8 @@ const ForgotPassword = () => {
       if (response.success) {
         setEmailSent(true);
         showToast(
-          response.message || "Password reset instructions sent to your email",
+          response.message ||
+            "Your login credentials have been sent to your email.",
           "success"
         );
       } else {
@@ -98,10 +99,7 @@ const ForgotPassword = () => {
       }
     } catch (error) {
       console.error("❌ Forgot Password Error:", error);
-      showToast(
-        "An unexpected error occurred. Please try again.",
-        "error"
-      );
+      showToast("An unexpected error occurred. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -152,8 +150,8 @@ const ForgotPassword = () => {
               <View style={styles.titleSection}>
                 <Text style={styles.mainTitle}>Forgot Password?</Text>
                 <Text style={styles.subtitle}>
-                  Don't worry! Enter your email address and we'll send you
-                  instructions to reset your password.
+                  Don't worry! Enter your registered email address and we will
+                  send your login details to your inbox.
                 </Text>
               </View>
 
@@ -194,10 +192,7 @@ const ForgotPassword = () => {
 
                 {/* Reset Password Button */}
                 <TouchableOpacity
-                  style={[
-                    styles.resetButton,
-                    loading && styles.buttonDisabled,
-                  ]}
+                  style={[styles.resetButton, loading && styles.buttonDisabled]}
                   onPress={handleResetPassword}
                   disabled={loading}
                   activeOpacity={0.8}
@@ -235,23 +230,10 @@ const ForgotPassword = () => {
 
                 <Text style={styles.successTitle}>Check Your Email</Text>
                 <Text style={styles.successSubtitle}>
-                  We've sent password reset instructions to
+                  Your account credentials have been sent to
                 </Text>
-                <Text style={styles.emailText}>{email}</Text>
 
-                <View style={styles.infoCard}>
-                  <Ionicons
-                    name="information-circle"
-                    size={24}
-                    color={theme.colors.primary.main}
-                  />
-                  <View style={styles.infoTextContainer}>
-                    <Text style={styles.infoText}>
-                      The link will expire in 1 hour. If you don't see the
-                      email, check your spam folder.
-                    </Text>
-                  </View>
-                </View>
+                <Text style={styles.emailText}>{email}</Text>
 
                 {/* Resend Button */}
                 <TouchableOpacity

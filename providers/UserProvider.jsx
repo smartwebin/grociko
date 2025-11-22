@@ -98,6 +98,12 @@ export const UserProvider = ({ children }) => {
           refreshIntervalRef.current = null;
         }
       };
+    } else {
+      // If not authenticated, clear the interval
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
     }
   }, [state.isAuthenticated, state.user?.id]);
 
@@ -111,7 +117,7 @@ export const UserProvider = ({ children }) => {
         getJwtToken(),
       ]);
 
-      if (userData && jwt) {
+      if (userData && Object.keys(userData).length > 0 && jwt) {
         dispatch({
           type: USER_ACTIONS.SET_USER,
           payload: {
@@ -218,17 +224,24 @@ export const UserProvider = ({ children }) => {
   // Logout user
   const logoutUser = async () => {
     try {
-      // Clear the refresh interval
+      // Clear the refresh interval first
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;
       }
 
+      // Clear user data from storage
       await clearUserData();
+      
+      // Dispatch logout action to reset state
       dispatch({ type: USER_ACTIONS.LOGOUT });
+      
+      console.log('✅ User logged out successfully');
       return { success: true };
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('❌ Error logging out:', error);
+      // Even if there's an error, still dispatch logout to clear the state
+      dispatch({ type: USER_ACTIONS.LOGOUT });
       return { success: false, error: error.message };
     }
   };
@@ -303,4 +316,3 @@ export const useUser = () => {
 
 // Export action types for testing or advanced usage
 export { USER_ACTIONS };
-

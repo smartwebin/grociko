@@ -24,7 +24,11 @@ const Help = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [contactData, setContactData] = useState(null);
-  const [toast, setToast] = useState({ visible: false, message: "", type: "error" });
+  const [toast, setToast] = useState({
+    visible: false,
+    message: "",
+    type: "error",
+  });
   const toastAnim = useRef(new Animated.Value(0)).current;
 
   const [contactForm, setContactForm] = useState({
@@ -200,7 +204,10 @@ const Help = () => {
           message: "",
         });
       } else {
-        showToast(response.error || "Failed to send message. Try again.", "error");
+        showToast(
+          response.error || "Failed to send message. Try again.",
+          "error"
+        );
       }
     } catch (error) {
       console.error("❌ Send Message Error:", error);
@@ -438,27 +445,32 @@ const Help = () => {
                     editable={!sending}
                   />
                 </View>
-
-                <TouchableOpacity
-                  style={[
-                    styles.sendButton,
-                    sending && styles.sendButtonDisabled,
-                  ]}
-                  onPress={handleSendMessage}
-                  disabled={sending}
-                >
-                  {sending ? (
-                    <ActivityIndicator
-                      size="small"
-                      color={theme.colors.text.white}
-                    />
-                  ) : (
-                    <Text style={styles.sendButtonText}>Send Message</Text>
-                  )}
-                </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
+        )}
+        {!loading && (
+          <View
+            style={{
+              paddingHorizontal: theme.spacing.lg,
+              marginBottom: theme.spacing.lg,
+            }}
+          >
+            <TouchableOpacity
+              style={[styles.sendButton, sending && styles.sendButtonDisabled]}
+              onPress={handleSendMessage}
+              disabled={sending}
+            >
+              {sending ? (
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.text.white}
+                />
+              ) : (
+                <Text style={styles.sendButtonText}>Send Message</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         )}
 
         {/* Toast Notification */}

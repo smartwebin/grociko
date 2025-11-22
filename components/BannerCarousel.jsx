@@ -4,6 +4,10 @@ import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from "react-nat
 import Swiper from "react-native-swiper";
 
 const { width: screenWidth } = Dimensions.get("window");
+const BANNER_PADDING = theme.spacing.lg;
+const BANNER_WIDTH = screenWidth - (BANNER_PADDING * 2);
+const IMAGE_ASPECT_RATIO = 365 / 100; // width / height
+const BANNER_HEIGHT = BANNER_WIDTH / IMAGE_ASPECT_RATIO;
 
 const BannerCarousel = ({ data, onPress }) => {
   const [index, setIndex] = useState(0);
@@ -18,7 +22,7 @@ const BannerCarousel = ({ data, onPress }) => {
         dotStyle={styles.dot}
         activeDotStyle={styles.activeDot}
         onIndexChanged={setIndex}
-        height={130} // height auto-adjusts because we use resizeMode="contain"
+        height={BANNER_HEIGHT + theme.spacing['2xl']}
       >
         {data.map((item, i) => (
           <TouchableOpacity
@@ -27,11 +31,13 @@ const BannerCarousel = ({ data, onPress }) => {
             style={styles.slide}
             onPress={() => onPress && onPress(item)}
           >
-            <Image
-              source={typeof item.image === "string" ? { uri: item.image } : item.image}
-              style={styles.bannerImage}
-              resizeMode="contain"  // ⛔ No image cut — keeps aspect ratio
-            />
+            <View style={styles.imageContainer}>
+              <Image
+                source={typeof item.image === "string" ? { uri: item.image } : item.image}
+                style={styles.bannerImage}
+                resizeMode="cover"
+              />
+            </View>
           </TouchableOpacity>
         ))}
       </Swiper>
@@ -42,37 +48,44 @@ const BannerCarousel = ({ data, onPress }) => {
 const styles = StyleSheet.create({
   container: {
     width: screenWidth,
+    height: BANNER_HEIGHT + theme.spacing['2xl'],
     alignSelf: "center",
-        marginBottom:10
-
+    marginBottom: theme.spacing.md,
   },
   slide: {
-    width: screenWidth,
-    height: 130,
-    paddingHorizontal: theme.spacing.md,
+    flex: 1,
+    paddingHorizontal: BANNER_PADDING,
     justifyContent: "center",
     alignItems: "center",
+  },
+  imageContainer: {
+    width: BANNER_WIDTH,
+    height: BANNER_HEIGHT,
+    borderRadius: theme.borderRadius.lg,
+    overflow: "hidden",
+    backgroundColor: theme.colors.background.secondary,
   },
   bannerImage: {
     width: "100%",
     height: "100%",
-    borderRadius:20,
   },
-
-  // Pagination
   pagination: {
-    bottom: 10,
+    bottom: theme.spacing.xs,
+    paddingBottom:10
   },
   dot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: theme.borderRadius.sm,
     backgroundColor: theme.colors.surface.border,
+    marginHorizontal: theme.spacing.xs,
   },
   activeDot: {
     width: 20,
-    borderRadius: 4,
+    height: 8,
+    borderRadius: theme.borderRadius.sm,
     backgroundColor: theme.colors.primary.main,
+    marginHorizontal: theme.spacing.xs,
   },
 });
 

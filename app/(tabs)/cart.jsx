@@ -77,7 +77,7 @@ const Cart = () => {
       (item.sellingPrice || item.price || 0) * item.quantity;
     const itemVatAmount = itemBasePrice * vatRate;
     const itemTotalPrice = itemBasePrice + itemVatAmount;
-
+// {console.log("item",item)}
     return (
       <View style={styles.cartItem}>
         <Image

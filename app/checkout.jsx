@@ -72,11 +72,11 @@ const Checkout = () => {
   };
 
   const subtotal = parseFloat(formattedPrice.replace(/[£$,]/g, "")) || 0;
-  const promoDiscount = appliedPromo
-    ? appliedPromo.offer_percentage
-      ? subtotal * (parseFloat(appliedPromo.offer_percentage) / 100)
-      : parseFloat(appliedPromo.offer_price || 0)
-    : 0;
+ const promoDiscount = appliedPromo
+  ? appliedPromo.offer_percentage && parseFloat(appliedPromo.offer_percentage) > 0
+    ? subtotal * (parseFloat(appliedPromo.offer_percentage) / 100)
+    : parseFloat(appliedPromo.offer_price || 0)
+  : 0;
   const discountedSubtotal = subtotal - promoDiscount;
   const vatAmount = calculateVATAmount();
   const totalAmount = discountedSubtotal + deliveryFee + vatAmount;
@@ -354,9 +354,9 @@ const Checkout = () => {
     setPromoCode("");
     setShowPromoSuggestions(false);
 
-    const discountAmount = foundPromo.offer_percentage
-      ? subtotal * (parseFloat(foundPromo.offer_percentage) / 100)
-      : parseFloat(foundPromo.offer_price || 0);
+    const discountAmount = foundPromo.offer_percentage && parseFloat(foundPromo.offer_percentage) > 0
+  ? subtotal * (parseFloat(foundPromo.offer_percentage) / 100)
+  : parseFloat(foundPromo.offer_price || 0);
 
     Alert.alert(
       "Promo Applied!",
@@ -915,12 +915,12 @@ const Checkout = () => {
                             {promo.offer_code}
                           </Text>
                           <Text style={styles.promoSuggestionDesc}>
-                            {promo.offer_percentage
-                              ? `${promo.offer_percentage}% OFF`
-                              : `£${promo.offer_price} OFF`}
-                            {promo.minimum_order &&
-                              ` on orders above £${promo.minimum_order}`}
-                          </Text>
+  {promo.offer_percentage && parseFloat(promo.offer_percentage) > 0
+    ? `${promo.offer_percentage}% OFF`
+    : `£${promo.offer_price} OFF`}
+  {promo.minimum_order &&
+    ` on orders above £${promo.minimum_order}`}
+</Text>
                         </View>
                         <Ionicons
                           name="chevron-forward"
@@ -1464,7 +1464,7 @@ const styles = StyleSheet.create({
   },
   placeOrderButtonDisabled: {
     opacity: 0.6,
-    backgroundColor: theme.colors.surface.border,
+    // backgroundColor: theme.colors.surface.border,
   },
   loadingButtonContent: {
     flexDirection: "row",

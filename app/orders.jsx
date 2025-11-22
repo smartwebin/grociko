@@ -1,4 +1,5 @@
 import SafeAreaWrapper from "@/components/SafeAreaWrapper";
+import SafeAreaWrapper2 from "@/components/SafeAreaWrapper2";
 import { useCart } from "@/providers/CartProvider";
 import { getUserData, getUserOrders } from "@/services/apiService";
 import theme from "@/utils/theme";
@@ -91,7 +92,7 @@ const Orders = () => {
         {
           text: "Add to Cart",
           onPress: () => {
-            // Add all order items to cart
+            // Add all order items to cart with their original quantities
             let addedCount = 0;
             order.items.forEach((item) => {
               const cartItem = {
@@ -101,9 +102,9 @@ const Orders = () => {
                 mrp: item.unit_mrp,
                 sellingPrice: item.price,
                 image: item.image,
-                quantity: item.quantity,
+                quantity: item.quantity, // This is already the correct quantity from the order
               };
-              addToCart(cartItem);
+              addToCart(cartItem, item.quantity); // Pass the original quantity
               addedCount++;
             });
 
@@ -154,7 +155,7 @@ const Orders = () => {
 
   const renderOrderItem = ({ item }) => {
     const paymentInfo = getPaymentMethodInfo(item.paymentMethod);
-
+    // console.log("renderOrderItem",item)
     return (
       <TouchableOpacity
         style={styles.orderCard}
@@ -332,7 +333,7 @@ const Orders = () => {
           animationType="slide"
           presentationStyle="pageSheet"
         >
-          <SafeAreaWrapper>
+          <SafeAreaWrapper2>
             <View style={styles.modalContainer}>
               {/* Modal Header */}
               <View style={styles.modalHeader}>
@@ -534,7 +535,7 @@ const Orders = () => {
                 </TouchableOpacity>
               </View>
             </View>
-          </SafeAreaWrapper>
+          </SafeAreaWrapper2>
         </Modal>
       </View>
     </SafeAreaWrapper>
@@ -795,6 +796,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.background.primary,
+    paddingBottom: theme.spacing.lg,
   },
   modalHeader: {
     flexDirection: "row",
