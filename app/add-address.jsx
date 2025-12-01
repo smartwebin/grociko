@@ -151,6 +151,8 @@ const AddAddress = () => {
       const response = await lookupPostcode(postcodeInput);
 
       if (response.success && response.data.length > 0) {
+                  console.log("response.data",response.data)
+
         setFoundAddresses(response.data);
         setAddressListModalVisible(true);
       } else {
@@ -164,26 +166,50 @@ const AddAddress = () => {
       setLookingUp(false);
     }
   };
+const formatAddressLines = ({ line_1, line_2 }) => {
+  let newLine1 = "";
+  let newLine2 = "";
+  let newLine3 = "";
+
+  if (line_2 && line_2.trim() !== "") {
+    // Case 1: line_2 exists → shift
+    newLine2 = line_1;
+    newLine3 = line_2;
+  } else {
+    // Case 2: no line_2 → move line_1 to line_2
+    newLine3 = line_1;
+    newLine2 = "";
+  }
+
+  return {
+    line_1: newLine1,
+    line_2: newLine2,
+    line_3: newLine3,
+  };
+};
 
   const handleSelectFoundAddress = (address) => {
-    setSelectedFoundAddress(address);
-    // console.log("Selected address:", address);
-    // Auto-fill form with selected address
-    setFormData({
-      line_1: "",
-      line_2: "",
-      line_3: address.line_2 || "",
-      post_town: address.post_town || "",
-      city: address.post_town || address.city || "",
-      pincode: address.postcode || postcodeInput,
-      county: address.county || "",
-      district: address.district || "",
-      ward: address.ward || "",
-      landmark: formData.landmark || "",
-    });
+  setSelectedFoundAddress(address);
 
-    setAddressListModalVisible(false);
-  };
+  const formatted = formatAddressLines({
+    line_1: address.line_1,
+    line_2: address.line_2
+  });
+
+  setFormData({
+    ...formatted,
+    post_town: address.post_town || "",
+    city: address.post_town || address.city || "",
+    pincode: address.postcode || postcodeInput,
+    county: address.county || "",
+    district: address.district || "",
+    ward: address.ward || "",
+    landmark: formData.landmark || "",
+  });
+
+  setAddressListModalVisible(false);
+};
+
 
   const handleSave = async () => {
     // Validation

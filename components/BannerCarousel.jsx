@@ -11,14 +11,14 @@ const BANNER_HEIGHT = BANNER_WIDTH / IMAGE_ASPECT_RATIO;
 
 const BannerCarousel = ({ data, onPress }) => {
   const [index, setIndex] = useState(0);
-
+// console.log("data",data)
   return (
     <View style={styles.container}>
       <Swiper
         autoplay
         autoplayTimeout={4}
-        showsPagination={true}
-        paginationStyle={styles.pagination}
+        showsPagination={false}
+        // paginationStyle={styles.pagination}
         dotStyle={styles.dot}
         activeDotStyle={styles.activeDot}
         onIndexChanged={setIndex}

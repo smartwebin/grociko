@@ -35,60 +35,6 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [catProducts, setCatProducts] = useState([]);
 
-  // Color mapping for categories (fallback to theme colors)
-  const categoryColorMap = {
-    fruits: {
-      bg: theme.colors.category.fruits.background,
-      border: theme.colors.category.fruits.border,
-    },
-    vegetable: {
-      bg: theme.colors.category.fruits.background,
-      border: theme.colors.category.fruits.border,
-    },
-    oil: {
-      bg: theme.colors.category.oil.background,
-      border: theme.colors.category.oil.border,
-    },
-    meat: {
-      bg: theme.colors.category.meat.background,
-      border: theme.colors.category.meat.border,
-    },
-    fish: {
-      bg: theme.colors.category.meat.background,
-      border: theme.colors.category.meat.border,
-    },
-    bakery: {
-      bg: theme.colors.category.bakery.background,
-      border: theme.colors.category.bakery.border,
-    },
-    snacks: {
-      bg: theme.colors.category.bakery.background,
-      border: theme.colors.category.bakery.border,
-    },
-    dairy: {
-      bg: theme.colors.category.dairy.background,
-      border: theme.colors.category.dairy.border,
-    },
-    eggs: {
-      bg: theme.colors.category.dairy.background,
-      border: theme.colors.category.dairy.border,
-    },
-    beverages: {
-      bg: theme.colors.category.beverages.background,
-      border: theme.colors.category.beverages.border,
-    },
-  };
-
-  const getCategoryColors = (categoryName) => {
-    const lowerName = categoryName?.toLowerCase() || "";
-    for (const [key, colors] of Object.entries(categoryColorMap)) {
-      if (lowerName.includes(key)) {
-        return colors;
-      }
-    }
-    return { bg: "#FFF8E1", border: "#FFD54F" }; // Default colors
-  };
-
   // Fetch all data every time screen comes into focus
   useFocusEffect(
     useCallback(() => {
@@ -121,16 +67,14 @@ const Home = () => {
       // Map sliders data
       if (slidersRes.success && slidersRes.data.length > 0) {
         const mappedSliders = slidersRes.data.map((slider, index) => {
-          const colors = getCategoryColors(slider.category);
-          // console.log("slider.image",slider.image)
           return {
             id: slider.id,
+            cat_id: slider.cat_id,
             title: slider.category || `Slider ${slider.id}`,
-            subtitle: "Fresh & Delicious",
             image: slider.image
               ? { uri: slider.image }
               : require("../../assets/images/slider/slider_1.png"),
-            backgroundColor: colors.bg,
+            backgroundColor: slider.bgcolor || "#FFF8E1", // Use from API with fallback
           };
         });
         setBannerData(mappedSliders);
@@ -139,13 +83,11 @@ const Home = () => {
       // Map categories data
       if (categoriesRes.success && categoriesRes.data.length > 0) {
         const mappedCategories = categoriesRes.data.map((cat) => {
-          const colors = getCategoryColors(cat.category);
-          // console.log(`nameCat:`, cat);
           return {
             id: cat.id,
             name: cat.category,
-            backgroundColor: colors.bg,
-            borderColor: colors.border,
+            backgroundColor: cat.bgcolor || "#FFF8E1", // Use from API with fallback
+            borderColor: cat.border || "#FFD54F", // Use from API with fallback
             image: cat.image
               ? { uri: cat.image }
               : require("../../assets/images/category/vegetables.png"),
@@ -162,8 +104,8 @@ const Home = () => {
               id: product.id,
               name: product.name,
               vat_cat: product.vat_cat || "",
-              tag:product.tag,
-              tag_color:product.tag_color,
+              tag: product.tag,
+              tag_color: product.tag_color,
               quantity: product.quantity || 0,
               weight: product.weight,
               unit:
@@ -203,8 +145,8 @@ const Home = () => {
           name: product.name,
           vat_cat: product.vat_cat || "",
           quantity: product.quantity || 0,
-          tag:product.tag,
-          tag_color:product.tag_color,
+          tag: product.tag,
+          tag_color: product.tag_color,
           weight: product.weight,
           unit:
             product.unit ||
@@ -234,7 +176,8 @@ const Home = () => {
 
   const handleBannerPress = (item) => {
     // Navigate to category or promotion page
-    router.push(`/search?cat_id=${item.id}`);
+    // console.log("search",item.cat_id)
+    router.push(`/search?cat_id=${item.cat_id}`);
   };
 
   const handleCategoryPress = (item) => {
@@ -617,8 +560,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginBottom: theme.spacing.sm,
     overflow: "hidden",
-    borderWidth: 2,
-    borderColor: theme.colors.surface.border,
+    // borderWidth: 2,
+    // borderColor: theme.colors.surface.border,
   },
   brandImage: {
     width: "100%",

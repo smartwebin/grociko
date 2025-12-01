@@ -48,7 +48,9 @@ const LegalPolicy = () => {
       subtitle: "Our commitment to flexibility",
       icon: "refresh-circle",
       apiEndpoint: "get-cancellation-refund-policy.php",
-      gradient: [theme.colors.secondary.main, theme.colors.secondary.dark],
+      // gradient: [theme.colors.secondary.main, theme.colors.secondary.dark],
+            gradient: [theme.colors.primary.main, theme.colors.primary.dark],
+
       accentColor: theme.colors.secondary.main,
     },
     privacy: {
@@ -56,7 +58,9 @@ const LegalPolicy = () => {
       subtitle: "How we protect your data",
       icon: "shield-checkmark",
       apiEndpoint: "get-privacy-policy.php",
-      gradient: ["#2196F3", "#1976D2"],
+      // gradient: ["#2196F3", "#1976D2"],
+            gradient: [theme.colors.primary.main, theme.colors.primary.dark],
+
       accentColor: "#2196F3",
     },
   };

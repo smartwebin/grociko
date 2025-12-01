@@ -42,17 +42,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/company/lgo.png",
+          "image": "./assets/images/icon.png",
+          "imageWidth": 200,
           "resizeMode": "contain",
-          "imageWidth": 220,
-          "backgroundColor": "#ea8732",
-          "android": {
-            "resizeMode": "contain",
-            "imageWidth": 220
-          },
-          "ios": {
-            "resizeMode": "contain",
-            "imageWidth": 220
+          "backgroundColor": "#FFFFFF",
+          "dark": {
+            "image": "./assets/images/icon2.png",
+            "backgroundColor": "#000000"
           }
         }
       ],

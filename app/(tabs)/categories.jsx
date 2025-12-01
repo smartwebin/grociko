@@ -21,28 +21,6 @@ const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🟩 Category Color Mapping (same as in Home)
-  const categoryColorMap = {
-    fruits: { bg: theme.colors.category.fruits.background, border: theme.colors.category.fruits.border },
-    vegetable: { bg: theme.colors.category.fruits.background, border: theme.colors.category.fruits.border },
-    oil: { bg: theme.colors.category.oil.background, border: theme.colors.category.oil.border },
-    meat: { bg: theme.colors.category.meat.background, border: theme.colors.category.meat.border },
-    fish: { bg: theme.colors.category.meat.background, border: theme.colors.category.meat.border },
-    bakery: { bg: theme.colors.category.bakery.background, border: theme.colors.category.bakery.border },
-    snacks: { bg: theme.colors.category.bakery.background, border: theme.colors.category.bakery.border },
-    dairy: { bg: theme.colors.category.dairy.background, border: theme.colors.category.dairy.border },
-    eggs: { bg: theme.colors.category.dairy.background, border: theme.colors.category.dairy.border },
-    beverages: { bg: theme.colors.category.beverages.background, border: theme.colors.category.beverages.border },
-  };
-
-  const getCategoryColors = (name) => {
-    const lower = name?.toLowerCase() || '';
-    for (const [key, colors] of Object.entries(categoryColorMap)) {
-      if (lower.includes(key)) return colors;
-    }
-    return { bg: '#FFF8E1', border: '#FFD54F' };
-  };
-
   // 🟦 Fetch dynamic categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -51,12 +29,12 @@ const Categories = () => {
         const res = await getCategories('active');
         if (res.success && res.data.length > 0) {
           const mapped = res.data.map((cat) => {
-            const colors = getCategoryColors(cat.category);
             return {
               id: cat.id,
               name: cat.category,
-              backgroundColor: colors.bg,
-              borderColor: colors.border,
+              // Use colors from API, fallback to default if not present
+              backgroundColor: cat.bgcolor || '#FFF8E1',
+              borderColor: cat.border || '#FFD54F',
               image: cat.image ? { uri: cat.image } : require('../../assets/images/category/vegetables.png'),
               cat_id: cat.id,
             };

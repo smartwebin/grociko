@@ -292,11 +292,7 @@ export default function ProductDetail() {
                   <Text style={styles.tagText}>{product.category}</Text>
                 </View>
               )}
-              {product.brand && (
-                <View style={[styles.tag, styles.brandTag]}>
-                  <Text style={styles.tagText}>{product.brand}</Text>
-                </View>
-              )}
+              
             </View>
           </View>
 
@@ -386,157 +382,64 @@ export default function ProductDetail() {
                 <Text style={styles.specValue}>{product.quantity}</Text>
               </View>
             )}
-            {product.tag && (
+            {product.brand && (
               <View style={styles.specRow}>
-                <Text style={styles.specLabel}>Tags</Text>
-                <Text style={styles.specValue}>{product.tag}</Text>
+                <Text style={styles.specLabel}>Brand</Text>
+                <Text style={styles.specValue}>{product.brand}</Text>
               </View>
             )}
+            {product.feature_title1 && product.feature_description1 && (
+  <View style={styles.specRow}>
+    <Text style={styles.specLabel}>{product.feature_title1}</Text>
+    <Text style={styles.specValue}>{product.feature_description1}</Text>
+  </View>
+)}
+
+{product.feature_title2 && product.feature_description2 && (
+  <View style={styles.specRow}>
+    <Text style={styles.specLabel}>{product.feature_title2}</Text>
+    <Text style={styles.specValue}>{product.feature_description2}</Text>
+  </View>
+)}
+
+{product.feature_title3 && product.feature_description3 && (
+  <View style={styles.specRow}>
+    <Text style={styles.specLabel}>{product.feature_title3}</Text>
+    <Text style={styles.specValue}>{product.feature_description3}</Text>
+  </View>
+)}
+
+{product.feature_title4 && product.feature_description4 && (
+  <View style={styles.specRow}>
+    <Text style={styles.specLabel}>{product.feature_title4}</Text>
+    <Text style={styles.specValue}>{product.feature_description4}</Text>
+  </View>
+)}
+
+{product.feature_title5 && product.feature_description5 && (
+  <View style={styles.specRow}>
+    <Text style={styles.specLabel}>{product.feature_title5}</Text>
+    <Text style={styles.specValue}>{product.feature_description5}</Text>
+  </View>
+)}
+
           </View>
         </View>
         {/* Product Detail Section */}
-        {product.description && (
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.sectionHeader}
-              onPress={() => setIsDetailExpanded(!isDetailExpanded)}
-            >
-              <Text style={styles.sectionTitle}>Product Detail</Text>
-              <Ionicons
-                name={isDetailExpanded ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={theme.colors.text.secondary}
-              />
-            </TouchableOpacity>
+{product.description && (
+  <View style={styles.section}>
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>Product Detail</Text>
+    </View>
 
-            {isDetailExpanded && (
-              <View style={styles.sectionContent}>
-                <Text style={styles.description}>{product.description}</Text>
-              </View>
-            )}
-          </View>
-        )}
+    <View style={styles.sectionContent}>
+      <Text style={styles.description}>{product.description}</Text>
+    </View>
+  </View>
+)}
 
-        {/* Feature Sections */}
-        {product.feature_title1 && product.feature_description1 && (
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.sectionHeader}
-              onPress={() => setIsFeature1Expanded(!isFeature1Expanded)}
-            >
-              <Text style={styles.sectionTitle}>{product.feature_title1}</Text>
-              <Ionicons
-                name={isFeature1Expanded ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={theme.colors.text.secondary}
-              />
-            </TouchableOpacity>
 
-            {isFeature1Expanded && (
-              <View style={styles.sectionContent}>
-                <Text style={styles.description}>
-                  {product.feature_description1}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {product.feature_title2 && product.feature_description2 && (
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.sectionHeader}
-              onPress={() => setIsFeature2Expanded(!isFeature2Expanded)}
-            >
-              <Text style={styles.sectionTitle}>{product.feature_title2}</Text>
-              <Ionicons
-                name={isFeature2Expanded ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={theme.colors.text.secondary}
-              />
-            </TouchableOpacity>
-
-            {isFeature2Expanded && (
-              <View style={styles.sectionContent}>
-                <Text style={styles.description}>
-                  {product.feature_description2}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {product.feature_title3 && product.feature_description3 && (
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.sectionHeader}
-              onPress={() => setIsFeature3Expanded(!isFeature3Expanded)}
-            >
-              <Text style={styles.sectionTitle}>{product.feature_title3}</Text>
-              <Ionicons
-                name={isFeature3Expanded ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={theme.colors.text.secondary}
-              />
-            </TouchableOpacity>
-
-            {isFeature3Expanded && (
-              <View style={styles.sectionContent}>
-                <Text style={styles.description}>
-                  {product.feature_description3}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {product.feature_title4 && product.feature_description4 && (
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.sectionHeader}
-              onPress={() => setIsFeature4Expanded(!isFeature4Expanded)}
-            >
-              <Text style={styles.sectionTitle}>{product.feature_title4}</Text>
-              <Ionicons
-                name={isFeature4Expanded ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={theme.colors.text.secondary}
-              />
-            </TouchableOpacity>
-
-            {isFeature4Expanded && (
-              <View style={styles.sectionContent}>
-                <Text style={styles.description}>
-                  {product.feature_description4}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {product.feature_title5 && product.feature_description5 && (
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.sectionHeader}
-              onPress={() => setIsFeature5Expanded(!isFeature5Expanded)}
-            >
-              <Text style={styles.sectionTitle}>{product.feature_title5}</Text>
-              <Ionicons
-                name={isFeature5Expanded ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={theme.colors.text.secondary}
-              />
-            </TouchableOpacity>
-
-            {isFeature5Expanded && (
-              <View style={styles.sectionContent}>
-                <Text style={styles.description}>
-                  {product.feature_description5}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
+        
         {product.quantity <= 10 && (
           <Text style={styles.stockWarning}>
             Only {product.quantity} left in stock
@@ -812,7 +715,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
   },
   sectionContent: {
-    paddingTop: theme.spacing.md,
+    padding: theme.spacing.lg,
   },
   shortDescription: {
     fontSize: theme.typography.fontSize.base,

@@ -95,8 +95,6 @@ const PromoCode = () => {
               style={styles.promoImage}
               resizeMode="cover"
             />
-            {/* Gradient Overlay */}
-            <View style={styles.imageGradient} />
             
             {/* Discount Badge on Image */}
             <View style={styles.imageDiscountBadge}>
@@ -436,21 +434,14 @@ const styles = StyleSheet.create({
   },
   promoImageContainer: {
     width: "100%",
-    height: 140,
+    height: 200,
     position: "relative",
   },
   promoImage: {
     width: "100%",
     height: "100%",
   },
-  imageGradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "50%",
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-  },
+ 
   imageDiscountBadge: {
     position: "absolute",
     top: theme.spacing.md,
