@@ -1,17 +1,17 @@
 import * as SplashScreen from "expo-splash-screen";
 SplashScreen.preventAutoHideAsync();
 
-import STRIPE_CONFIG from '@/config/stripe.config';
+import STRIPE_CONFIG from "@/config/stripe.config";
 import { CartProvider } from "@/providers/CartProvider";
 import { UserProvider } from "@/providers/UserProvider";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "expo-font";
-import * as NavigationBar from 'expo-navigation-bar';
+import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
-import { useEffect } from 'react';
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
-
 export default function RootLayout() {
   const [loaded] = useFonts({
     "Outfit-Thin": require("../assets/fonts/Outfit-Thin.ttf"),
@@ -51,6 +51,7 @@ export default function RootLayout() {
           </CartProvider>
         </UserProvider>
       </StripeProvider>
+      <StatusBar style="dark" />
     </GestureHandlerRootView>
   );
 }

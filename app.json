@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.smartwebin.grociko"
+      "package": "com.smartwebintech.grociko"
     },
     "web": {
       "output": "static",
@@ -69,7 +69,7 @@
         "position": "relative"
       },
       "eas": {
-        "projectId": "15fc78d9-0643-41ee-ac38-f7b0bdfb01bd"
+        "projectId": "0eb7cc83-b9fd-4117-ab6a-0f57249632bf"
       }
     }
   }
