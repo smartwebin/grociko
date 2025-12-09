@@ -6,10 +6,9 @@ import { CartProvider } from "@/providers/CartProvider";
 import { UserProvider } from "@/providers/UserProvider";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "expo-font";
-import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 export default function RootLayout() {
@@ -25,10 +24,7 @@ export default function RootLayout() {
     "Outfit-Black": require("../assets/fonts/Outfit-Black.ttf"),
   });
 
-  useEffect(() => {
-    NavigationBar.setBackgroundColorAsync("#000000");
-    NavigationBar.setButtonStyleAsync("light");
-  }, []);
+ 
 
   useEffect(() => {
     if (loaded) {
@@ -51,7 +47,7 @@ export default function RootLayout() {
           </CartProvider>
         </UserProvider>
       </StripeProvider>
-      <StatusBar style="dark" />
+      <StatusBar barStyle={"dark-content"} />
     </GestureHandlerRootView>
   );
 }
