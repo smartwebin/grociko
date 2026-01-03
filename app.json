@@ -11,6 +11,11 @@
     "ios": {
       "supportsTablet": true
     },
+    "androidStatusBar": {
+      "backgroundColor": "#FFFFFF",
+      "barStyle": "dark-content",
+      "translucent": false
+    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -18,7 +23,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false,
       "package": "com.smartwebintech.grociko"
     },
@@ -69,7 +74,7 @@
         "position": "relative"
       },
       "eas": {
-        "projectId": "c2e2ef0d-6274-4c39-abbc-4012446bb082"
+        "projectId": "0eb7cc83-b9fd-4117-ab6a-0f57249632bf"
       }
     }
   }

@@ -5,7 +5,7 @@
 
 export const STRIPE_CONFIG = {
   // Stripe Keys
-  PUBLISHABLE_KEY: "pk_test_51SPdlQHtVSVyviR9ZKAY3mcmn10XMHvAfrfQxYopMG6ckujqms340Lc3KE902kKaJs7efFPFNGDt6z73XV0CqiOf006jLCNDDv",
+  PUBLISHABLE_KEY: "pk_live_51SPdl3HDADMKFlPPsJMMeCyuWBW8RTzPx2qSSkPsh5AnJzY5cbleiMFON2wKJRnzCgX5OgVQGbUBBnGAljserGdy00StmqcFnX",
   
   // Note: Secret key should NEVER be exposed in frontend code
   // It will be used in backend PHP files only

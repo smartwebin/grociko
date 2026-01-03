@@ -151,7 +151,10 @@ const Checkout = () => {
             { text: "Cancel", style: "cancel", onPress: () => router.back() },
             {
               text: "Add Address",
-              onPress: () => router.push("/address-management"),
+              onPress: () => router.push({
+                pathname: "/address-management",
+                params: { checkout: 1}
+              }),
             },
           ]
         );
@@ -377,7 +380,10 @@ const Checkout = () => {
     if (addresses.length > 1) {
       setShowAddressModal(true);
     } else {
-      router.push("/address-management");
+      router.push({
+                pathname: "/address-management",
+                params: { checkout: 1}
+              });
     }
   };
 
@@ -1084,7 +1090,10 @@ const Checkout = () => {
                   style={styles.addNewAddressButton}
                   onPress={() => {
                     setShowAddressModal(false);
-                    router.push("/address-management");
+                    router.push({
+                pathname: "/address-management",
+                params: { checkout: 1}
+              });
                   }}
                 >
                   <Ionicons

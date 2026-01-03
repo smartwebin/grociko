@@ -24,8 +24,6 @@ export default function RootLayout() {
     "Outfit-Black": require("../assets/fonts/Outfit-Black.ttf"),
   });
 
- 
-
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -47,8 +45,7 @@ export default function RootLayout() {
           </CartProvider>
         </UserProvider>
       </StripeProvider>
-              <StatusBar translucent={false} style="dark" />
-
+      <StatusBar translucent={false} style="dark" />
     </GestureHandlerRootView>
   );
 }
