@@ -30,7 +30,8 @@ import {
 } from "react-native";
 
 const Checkout = () => {
-  const { items, getCartSummary, clearCart, removeFromCart, updateQuantity } = useCart();
+  const { items, getCartSummary, clearCart, removeFromCart, updateQuantity } =
+    useCart();
   const { formattedPrice, totalItems } = getCartSummary();
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
@@ -47,7 +48,7 @@ const Checkout = () => {
   const [deliveryZone, setDeliveryZone] = useState("");
   const [isServiceable, setIsServiceable] = useState(true);
   const [serviceabilityMessage, setServiceabilityMessage] = useState("");
-  
+
   // Stock verification states
   const [stockVerified, setStockVerified] = useState(false);
   const [unavailableItems, setUnavailableItems] = useState([]);
@@ -72,11 +73,12 @@ const Checkout = () => {
   };
 
   const subtotal = parseFloat(formattedPrice.replace(/[£$,]/g, "")) || 0;
- const promoDiscount = appliedPromo
-  ? appliedPromo.offer_percentage && parseFloat(appliedPromo.offer_percentage) > 0
-    ? subtotal * (parseFloat(appliedPromo.offer_percentage) / 100)
-    : parseFloat(appliedPromo.offer_price || 0)
-  : 0;
+  const promoDiscount = appliedPromo
+    ? appliedPromo.offer_percentage &&
+      parseFloat(appliedPromo.offer_percentage) > 0
+      ? subtotal * (parseFloat(appliedPromo.offer_percentage) / 100)
+      : parseFloat(appliedPromo.offer_price || 0)
+    : 0;
   const discountedSubtotal = subtotal - promoDiscount;
   const vatAmount = calculateVATAmount();
   const totalAmount = discountedSubtotal + deliveryFee + vatAmount;
@@ -151,10 +153,11 @@ const Checkout = () => {
             { text: "Cancel", style: "cancel", onPress: () => router.back() },
             {
               text: "Add Address",
-              onPress: () => router.push({
-                pathname: "/address-management",
-                params: { checkout: 1}
-              }),
+              onPress: () =>
+                router.push({
+                  pathname: "/address-management",
+                  params: { checkout: 1 },
+                }),
             },
           ]
         );
@@ -226,16 +229,19 @@ const Checkout = () => {
       if (!stockData.all_available) {
         // Track changes made to cart
         const changes = [];
-        
+
         // Process unavailable products
         stockData.unavailable_products.forEach((product) => {
-          const cartItem = items.find(item => item.id === product.prod_id);
-          
-          if (product.available_quantity > 0 && product.available_quantity < product.requested_quantity) {
+          const cartItem = items.find((item) => item.id === product.prod_id);
+
+          if (
+            product.available_quantity > 0 &&
+            product.available_quantity < product.requested_quantity
+          ) {
             // Reduce quantity to available stock
             updateQuantity(product.prod_id, product.available_quantity);
             changes.push({
-              type: 'reduced',
+              type: "reduced",
               name: product.name,
               oldQuantity: product.requested_quantity,
               newQuantity: product.available_quantity,
@@ -244,7 +250,7 @@ const Checkout = () => {
             // Remove item completely
             removeFromCart(product.prod_id);
             changes.push({
-              type: 'removed',
+              type: "removed",
               name: product.name,
               reason: product.reason,
             });
@@ -257,48 +263,44 @@ const Checkout = () => {
 
         // Build alert message
         let alertMessage = "The following changes were made to your cart:\n\n";
-        
-        const removedItems = changes.filter(c => c.type === 'removed');
-        const reducedItems = changes.filter(c => c.type === 'reduced');
-        
+
+        const removedItems = changes.filter((c) => c.type === "removed");
+        const reducedItems = changes.filter((c) => c.type === "reduced");
+
         if (removedItems.length > 0) {
           alertMessage += "Removed Items:\n";
-          removedItems.forEach(item => {
+          removedItems.forEach((item) => {
             alertMessage += `• ${item.name} (${item.reason})\n`;
           });
           alertMessage += "\n";
         }
-        
+
         if (reducedItems.length > 0) {
           alertMessage += "Quantity Adjusted:\n";
-          reducedItems.forEach(item => {
+          reducedItems.forEach((item) => {
             alertMessage += `• ${item.name}: ${item.oldQuantity} → ${item.newQuantity}\n`;
           });
         }
 
         alertMessage += "\nWould you like to continue with the updated cart?";
 
-        Alert.alert(
-          "Cart Updated",
-          alertMessage,
-          [
-            {
-              text: "Cancel",
-              style: "cancel",
-              onPress: () => {
-                setStockChanges([]);
-              }
+        Alert.alert("Cart Updated", alertMessage, [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {
+              setStockChanges([]);
             },
-            {
-              text: "Continue",
-              onPress: () => {
-                setUnavailableItems([]);
-                setStockVerified(true);
-                setStockChanges([]);
-              },
+          },
+          {
+            text: "Continue",
+            onPress: () => {
+              setUnavailableItems([]);
+              setStockVerified(true);
+              setStockChanges([]);
             },
-          ]
-        );
+          },
+        ]);
         return false;
       }
 
@@ -357,9 +359,10 @@ const Checkout = () => {
     setPromoCode("");
     setShowPromoSuggestions(false);
 
-    const discountAmount = foundPromo.offer_percentage && parseFloat(foundPromo.offer_percentage) > 0
-  ? subtotal * (parseFloat(foundPromo.offer_percentage) / 100)
-  : parseFloat(foundPromo.offer_price || 0);
+    const discountAmount =
+      foundPromo.offer_percentage && parseFloat(foundPromo.offer_percentage) > 0
+        ? subtotal * (parseFloat(foundPromo.offer_percentage) / 100)
+        : parseFloat(foundPromo.offer_price || 0);
 
     Alert.alert(
       "Promo Applied!",
@@ -381,9 +384,9 @@ const Checkout = () => {
       setShowAddressModal(true);
     } else {
       router.push({
-                pathname: "/address-management",
-                params: { checkout: 1}
-              });
+        pathname: "/address-management",
+        params: { checkout: 1 },
+      });
     }
   };
 
@@ -634,10 +637,9 @@ const Checkout = () => {
                   <Text style={styles.warningTitle}>Cart Updated</Text>
                   {stockChanges.map((change, index) => (
                     <Text key={index} style={styles.changeText}>
-                      {change.type === 'removed' 
+                      {change.type === "removed"
                         ? `• ${change.name} removed (${change.reason})`
-                        : `• ${change.name}: ${change.oldQuantity} → ${change.newQuantity}`
-                      }
+                        : `• ${change.name}: ${change.oldQuantity} → ${change.newQuantity}`}
                     </Text>
                   ))}
                 </View>
@@ -679,6 +681,22 @@ const Checkout = () => {
                 </View>
               </View>
             )}
+            <TouchableOpacity
+              style={styles.addAddressButton}
+              onPress={() =>
+                router.push({
+                  pathname: "/address-management",
+                  params: { checkout: 1 },
+                })
+              }
+            >
+              <Ionicons
+                name="add-circle-outline"
+                size={20}
+                color={theme.colors.primary.main}
+              />
+              <Text style={styles.addAddressButtonText}>Add New Address</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Order Items Summary */}
@@ -696,10 +714,7 @@ const Checkout = () => {
               const itemTotal = itemSubtotal + itemVatAmount;
 
               return (
-                <View
-                  key={item.id}
-                  style={styles.orderItem}
-                >
+                <View key={item.id} style={styles.orderItem}>
                   <Image
                     source={{
                       uri: item.image.uri ? item.image.uri : item.image,
@@ -708,15 +723,10 @@ const Checkout = () => {
                     contentFit="cover"
                   />
                   <View style={styles.orderItemInfo}>
-                    <Text
-                      style={styles.orderItemName}
-                      numberOfLines={1}
-                    >
+                    <Text style={styles.orderItemName} numberOfLines={1}>
                       {item.name}
                     </Text>
-                    <Text
-                      style={styles.orderItemDetails}
-                    >
+                    <Text style={styles.orderItemDetails}>
                       {item.quantity} x £{item.sellingPrice.toFixed(2)}
                     </Text>
                     {item.vat_cat === "B" && (
@@ -725,9 +735,7 @@ const Checkout = () => {
                       </Text>
                     )}
                   </View>
-                  <Text
-                    style={styles.orderItemTotal}
-                  >
+                  <Text style={styles.orderItemTotal}>
                     £{itemTotal.toFixed(2)}
                   </Text>
                 </View>
@@ -921,12 +929,13 @@ const Checkout = () => {
                             {promo.offer_code}
                           </Text>
                           <Text style={styles.promoSuggestionDesc}>
-  {promo.offer_percentage && parseFloat(promo.offer_percentage) > 0
-    ? `${promo.offer_percentage}% OFF`
-    : `£${promo.offer_price} OFF`}
-  {promo.minimum_order &&
-    ` on orders above £${promo.minimum_order}`}
-</Text>
+                            {promo.offer_percentage &&
+                            parseFloat(promo.offer_percentage) > 0
+                              ? `${promo.offer_percentage}% OFF`
+                              : `£${promo.offer_price} OFF`}
+                            {promo.minimum_order &&
+                              ` on orders above £${promo.minimum_order}`}
+                          </Text>
                         </View>
                         <Ionicons
                           name="chevron-forward"
@@ -981,43 +990,50 @@ const Checkout = () => {
             </View>
           </View>
           <View style={styles.bottomSection}>
-          <TouchableOpacity
-            style={[
-              styles.placeOrderButton,
-              (placing || processingPayment || !isServiceable || verifying) &&
-                styles.placeOrderButtonDisabled,
-            ]}
-            onPress={handlePlaceOrder}
-            disabled={placing || processingPayment || !isServiceable || verifying}
-          >
-            {placing || processingPayment || verifying ? (
-              <View style={styles.loadingButtonContent}>
-                <ActivityIndicator size="small" color={theme.colors.text.white} />
-                <Text style={styles.placeOrderText}>
-                  {verifying ? "Verifying..." : processingPayment ? "Processing Payment..." : "Placing Order..."}
-                </Text>
-              </View>
-            ) : (
-              <>
-                <Text style={styles.placeOrderText}>
-                  {!isServiceable
-                    ? "Delivery Unavailable"
-                    : selectedPaymentMethod === "card"
-                    ? "Pay Now"
-                    : "Place Order"}
-                </Text>
-                {isServiceable && (
-                  <Text style={styles.placeOrderPrice}>
-                    £{totalAmount.toFixed(2)}
+            <TouchableOpacity
+              style={[
+                styles.placeOrderButton,
+                (placing || processingPayment || !isServiceable || verifying) &&
+                  styles.placeOrderButtonDisabled,
+              ]}
+              onPress={handlePlaceOrder}
+              disabled={
+                placing || processingPayment || !isServiceable || verifying
+              }
+            >
+              {placing || processingPayment || verifying ? (
+                <View style={styles.loadingButtonContent}>
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors.text.white}
+                  />
+                  <Text style={styles.placeOrderText}>
+                    {verifying
+                      ? "Verifying..."
+                      : processingPayment
+                      ? "Processing Payment..."
+                      : "Placing Order..."}
                   </Text>
-                )}
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
+                </View>
+              ) : (
+                <>
+                  <Text style={styles.placeOrderText}>
+                    {!isServiceable
+                      ? "Delivery Unavailable"
+                      : selectedPaymentMethod === "card"
+                      ? "Pay Now"
+                      : "Place Order"}
+                  </Text>
+                  {isServiceable && (
+                    <Text style={styles.placeOrderPrice}>
+                      £{totalAmount.toFixed(2)}
+                    </Text>
+                  )}
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
         </ScrollView>
-
-        
 
         {/* Address Selection Modal */}
         <Modal
@@ -1091,9 +1107,9 @@ const Checkout = () => {
                   onPress={() => {
                     setShowAddressModal(false);
                     router.push({
-                pathname: "/address-management",
-                params: { checkout: 1}
-              });
+                      pathname: "/address-management",
+                      params: { checkout: 1 },
+                    });
                   }}
                 >
                   <Ionicons
@@ -1170,7 +1186,24 @@ const styles = StyleSheet.create({
   scrollContent: {
     // paddingBottom: theme.spacing["4xl"],
   },
-
+  addAddressButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.primary.main,
+    borderStyle: "dashed",
+  },
+  addAddressButtonText: {
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: "Outfit-SemiBold",
+    color: theme.colors.primary.main,
+    marginLeft: theme.spacing.sm,
+  },
   // Warning Banner Styles
   warningBanner: {
     backgroundColor: theme.colors.status.warning + "15",
