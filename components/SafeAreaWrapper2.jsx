@@ -6,7 +6,7 @@ const SafeAreaWrapper2 = ({ children, style, backgroundColor }) => {
   return (
     <SafeAreaView
       style={[styles.safeArea, style, backgroundColor && { backgroundColor }]}
-      edges={["top", "bottom", "left", "right"]}
+      edges={["top", "bottom"]}   // FIXED HERE
     >
       {children}
     </SafeAreaView>

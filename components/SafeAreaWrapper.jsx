@@ -13,7 +13,7 @@ const SafeAreaWrapper = ({ children, style, backgroundColor }) => {
         backgroundColor && { backgroundColor },
       ]}
     >
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
         {children}
       </SafeAreaView>
     </View>

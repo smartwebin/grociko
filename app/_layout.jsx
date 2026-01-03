@@ -7,8 +7,8 @@ import { UserProvider } from "@/providers/UserProvider";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 export default function RootLayout() {
@@ -47,7 +47,8 @@ export default function RootLayout() {
           </CartProvider>
         </UserProvider>
       </StripeProvider>
-      <StatusBar barStyle={"dark-content"} />
+              <StatusBar translucent={false} style="dark" />
+
     </GestureHandlerRootView>
   );
 }

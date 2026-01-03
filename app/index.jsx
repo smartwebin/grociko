@@ -6,9 +6,8 @@ import {
   Dimensions,
   Image,
   Platform,
-  StatusBar,
   StyleSheet,
-  View,
+  View
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -71,11 +70,7 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={theme.colors.background.gradient.splash}
-        translucent={false}
-      />
+      
 
       {/* Splash background */}
       <Image
