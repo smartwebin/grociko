@@ -104,70 +104,107 @@ const LegalPolicy = () => {
     extrapolate: 'clamp',
   });
 
-  // Enhanced HTML styling with modern typography
-  const htmlStyles = {
-    body: {
-      fontFamily: "Outfit-Regular",
-      fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary,
-      lineHeight: 26,
-    },
-    h1: {
-      fontFamily: "Outfit-Bold",
-      fontSize: theme.typography.fontSize["3xl"],
-      color: theme.colors.text.primary,
-      marginTop: theme.spacing["2xl"],
-      marginBottom: theme.spacing.lg,
-      lineHeight: 36,
-    },
-    h2: {
-      fontFamily: "Outfit-SemiBold",
-      fontSize: theme.typography.fontSize.xl,
-      color: theme.colors.text.primary,
-      marginTop: theme.spacing.xl,
-      marginBottom: theme.spacing.md,
-      lineHeight: 28,
-    },
-    h3: {
-      fontFamily: "Outfit-Medium",
-      fontSize: theme.typography.fontSize.lg,
-      color: theme.colors.text.primary,
-      marginTop: theme.spacing.lg,
-      marginBottom: theme.spacing.sm,
-      lineHeight: 26,
-    },
-    p: {
-      fontFamily: "Outfit-Regular",
-      fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.secondary,
-      marginBottom: theme.spacing.lg,
-      lineHeight: 26,
-    },
-    strong: {
-      fontFamily: "Outfit-SemiBold",
-      color: theme.colors.text.primary,
-    },
-    ul: {
-      marginLeft: theme.spacing.xl,
-      marginBottom: theme.spacing.lg,
-    },
-    ol: {
-      marginLeft: theme.spacing.xl,
-      marginBottom: theme.spacing.lg,
-    },
-    li: {
-      fontFamily: "Outfit-Regular",
-      fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.secondary,
-      marginBottom: theme.spacing.md,
-      lineHeight: 24,
-    },
-    a: {
-      color: currentPolicy.accentColor,
-      textDecorationLine: "underline",
-      fontFamily: "Outfit-Medium",
-    },
-  };
+ // Enhanced HTML styling with MINIMAL spacing
+const htmlStyles = {
+  body: {
+    fontFamily: "Outfit-Regular",
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text.primary,
+    lineHeight: 22,
+    margin: 0,
+    padding: 0,
+  },
+
+  /* HEADINGS — no top margins (hero already shows title) */
+  h1: {
+    fontFamily: "Outfit-Bold",
+    fontSize: theme.typography.fontSize["3xl"],
+    color: theme.colors.text.primary,
+    marginTop: 0,
+    marginBottom: 6,
+    lineHeight: 32,
+  },
+  h2: {
+    fontFamily: "Outfit-SemiBold",
+    fontSize: theme.typography.fontSize.xl,
+    color: theme.colors.text.primary,
+    marginTop: 8,
+    marginBottom: 4,
+    lineHeight: 26,
+  },
+  h3: {
+    fontFamily: "Outfit-Medium",
+    fontSize: theme.typography.fontSize.lg,
+    color: theme.colors.text.primary,
+    marginTop: 6,
+    marginBottom: 2,
+    lineHeight: 24,
+  },
+
+  /* PARAGRAPHS — ZERO margins (RN stacks margins) */
+  p: {
+    fontFamily: "Outfit-Regular",
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text.secondary,
+    marginTop: 0,
+    marginBottom: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    lineHeight: 22,
+  },
+
+  /* STRONG / EMPHASIS */
+  strong: {
+    fontFamily: "Outfit-SemiBold",
+    color: theme.colors.text.primary,
+  },
+  em: {
+    fontStyle: "italic",
+  },
+
+  /* LISTS — NO vertical margins */
+  ul: {
+    marginTop: 0,
+    marginBottom: 0,
+    paddingLeft: theme.spacing.lg,
+  },
+  ol: {
+    marginTop: 0,
+    marginBottom: 0,
+    paddingLeft: theme.spacing.lg,
+  },
+  li: {
+    fontFamily: "Outfit-Regular",
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text.secondary,
+    marginTop: 0,
+    marginBottom: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    lineHeight: 22,
+  },
+
+  /* LINKS */
+  a: {
+    color: currentPolicy.accentColor,
+    textDecorationLine: "underline",
+    fontFamily: "Outfit-Medium",
+  },
+
+  /* BLOCKS */
+  div: {
+    margin: 0,
+    padding: 0,
+  },
+  span: {
+    fontFamily: "Outfit-Regular",
+  },
+
+  /* HARD KILL LINE BREAKS */
+  br: {
+    display: "none",
+  },
+};
 
   if (loading) {
     return (

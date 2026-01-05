@@ -134,45 +134,95 @@ const About = () => {
     Linking.openURL('https://grociko.com/download');
   };
 
-  // Clean and format HTML content
-  const formatHtmlContent = (html) => {
-    if (!html) return '';
-    
-    // Wrap content in proper HTML structure for better rendering
-    let formattedHtml = html.trim();
-    
-    // Replace <br><br> with paragraph breaks for better spacing
-    formattedHtml = formattedHtml.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p>');
-    
-    // Wrap in paragraph tags if not already wrapped
-    if (!formattedHtml.startsWith('<p>')) {
-      formattedHtml = '<p>' + formattedHtml + '</p>';
-    }
-    
-    return formattedHtml;
-  };
+ // Clean and format HTML content - COMPLETELY FIXED VERSION
+const formatHtmlContent = (html) => {
+  if (!html) return '';
+  
+  let formattedHtml = html.trim();
+  
+  // Remove ALL <br> tags completely (they're causing spacing issues)
+  formattedHtml = formattedHtml.replace(/<br\s*\/?>/gi, ' ');
+  
+  // Remove empty paragraphs
+  formattedHtml = formattedHtml.replace(/<p>\s*<\/p>/gi, '');
+  
+  // Remove excessive whitespace between tags
+  formattedHtml = formattedHtml.replace(/>\s+</g, '><');
+  
+  // Normalize spaces inside paragraphs
+  formattedHtml = formattedHtml.replace(/\s{2,}/g, ' ');
+  
+  return formattedHtml;
+};
 
-  // HTML rendering configuration
-  const htmlBaseStyle = {
+// HTML rendering configuration - ULTRA MINIMAL SPACING VERSION
+const htmlBaseStyle = {
+  fontSize: theme.typography.fontSize.base,
+  fontFamily: 'Outfit-Regular',
+  color: theme.colors.text.secondary,
+  lineHeight: theme.typography.fontSize.base * 1.35, // Even tighter line height
+};
+
+const htmlTagsStyles = {
+  body: {
+    ...htmlBaseStyle,
+    margin: 0,
+    padding: 0,
+  },
+  p: {
+    ...htmlBaseStyle,
+    marginBottom: 0, // ULTRA minimal - just 2px between paragraphs
+    marginTop: 0,
+    paddingBottom: 0,
+    paddingTop: 0,
+  },
+  span: {
+    ...htmlBaseStyle,
+    margin: 0,
+  },
+  div: {
+    ...htmlBaseStyle,
+    marginBottom: 0,
+    marginTop: 0,
+  },
+  br: {
+    display: 'none', // Completely hide <br> tags
+  },
+  h1: {
+    fontSize: theme.typography.fontSize.xl,
+    fontFamily: 'Outfit-Bold',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
+  },
+  h2: {
+    fontSize: theme.typography.fontSize.lg,
+    fontFamily: 'Outfit-SemiBold',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
+    marginTop: theme.spacing.md,
+  },
+  h3: {
     fontSize: theme.typography.fontSize.base,
-    fontFamily: 'Outfit-Regular',
-    color: theme.colors.text.secondary,
-    lineHeight: theme.typography.fontSize.base * theme.typography.lineHeight.relaxed,
-  };
+    fontFamily: 'Outfit-SemiBold',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
+  },
+  ul: {
+  margin: 0,
+  paddingLeft: theme.spacing.lg,
+},
+ol: {
+  margin: 0,
+  paddingLeft: theme.spacing.lg,
+},
+li: {
+  marginBottom: 0,
+  paddingBottom: 0,
+},
 
-  const htmlTagsStyles = {
-    body: htmlBaseStyle,
-    p: {
-      ...htmlBaseStyle,
-      marginBottom: theme.spacing.lg,
-    },
-    span: htmlBaseStyle,
-    div: htmlBaseStyle,
-    br: {
-      height: theme.spacing.sm,
-    },
-  };
-
+};
   // Beautiful Loading State
   if (loading) {
     return (
@@ -370,34 +420,7 @@ const About = () => {
             </View>
           </View>
 
-          {/* Connect Section */}
-          {/* <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="share-social" size={24} color={theme.colors.primary.main} />
-              <Text style={styles.sectionTitle}>Connect With Us</Text>
-            </View>
-
-            <View style={styles.socialGrid}>
-              {socialLinks.map((social) => (
-                <TouchableOpacity
-                  key={social.id}
-                  style={styles.socialCard}
-                  onPress={() => handleSocialPress(social.url)}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      styles.socialIconContainer,
-                      { backgroundColor: `${social.color}15` },
-                    ]}
-                  >
-                    <Ionicons name={social.icon} size={28} color={social.color} />
-                  </View>
-                  <Text style={styles.socialName}>{social.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View> */}
+        
 
           {/* Actions Section */}
           <View style={styles.section}>
