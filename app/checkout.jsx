@@ -88,7 +88,7 @@ const Checkout = () => {
       id: "card",
       name: "Online Payment",
       icon: "card-outline",
-      details: "Pay with Card, Apple Pay, Google Pay",
+      details: "Pay with Card, Amazon Pay, Revolut Pay",
       description: "Secure payment via Stripe",
     },
     {
@@ -823,7 +823,7 @@ const Checkout = () => {
                 </View>
                 <Text style={styles.paymentInfoText}>
                   Complete your payment securely with Stripe. Accepts all major
-                  credit cards, Apple Pay, and Google Pay.
+                  credit cards, Amazon Pay, and Revolut Pay.
                 </Text>
               </View>
             </View>
