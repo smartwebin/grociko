@@ -2,7 +2,7 @@
 export const API_CONFIG = {
   // Base URLs
   BASE_URL: "https://grociko.co.uk/api",
-  BASE_IMG_URL: "https://grociko.co.uk/grociko/photos",
+  BASE_IMG_URL: "https://grociko.co.uk/photos",
   // BASE_URL: "http://192.168.1.3/Zen/grociko/api",
   // BASE_IMG_URL: "http://192.168.1.3/Zen/grociko/photos",
 
@@ -44,9 +44,9 @@ export const getImageUrl = (imageName, size = "large") => {
   if (!imageName) return null;
 
   const sizeUrls = {
-    large: "https://grociko.co.uk/grociko/photos/large",
-    medium: "https://grociko.co.uk/grociko/photos/medium",
-    small: "https://grociko.co.uk/grociko/photos/small",
+    large: "https://grociko.co.uk/photos/large",
+    medium: "https://grociko.co.uk/photos/medium",
+    small: "https://grociko.co.uk/photos/small",
   };
 
   return `${sizeUrls[size] || sizeUrls.large}/${imageName}`;

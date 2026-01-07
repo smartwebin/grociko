@@ -11,7 +11,7 @@ import {
   Text,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
 } from "react-native";
 import RenderHtml from "react-native-render-html";
 
@@ -27,7 +27,7 @@ import RenderHtml from "react-native-render-html";
 const LegalPolicy = () => {
   const { type = "terms" } = useLocalSearchParams();
   const { width } = useWindowDimensions();
-  
+
   const [loading, setLoading] = useState(true);
   const [policyData, setPolicyData] = useState(null);
   const [error, setError] = useState(null);
@@ -49,7 +49,7 @@ const LegalPolicy = () => {
       icon: "refresh-circle",
       apiEndpoint: "get-cancellation-refund-policy.php",
       // gradient: [theme.colors.secondary.main, theme.colors.secondary.dark],
-            gradient: [theme.colors.primary.main, theme.colors.primary.dark],
+      gradient: [theme.colors.primary.main, theme.colors.primary.dark],
 
       accentColor: theme.colors.secondary.main,
     },
@@ -59,7 +59,7 @@ const LegalPolicy = () => {
       icon: "shield-checkmark",
       apiEndpoint: "get-privacy-policy.php",
       // gradient: ["#2196F3", "#1976D2"],
-            gradient: [theme.colors.primary.main, theme.colors.primary.dark],
+      gradient: [theme.colors.primary.main, theme.colors.primary.dark],
 
       accentColor: "#2196F3",
     },
@@ -95,116 +95,134 @@ const LegalPolicy = () => {
   const headerOpacity = scrollY.interpolate({
     inputRange: [0, 100],
     outputRange: [0, 1],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   const heroScale = scrollY.interpolate({
     inputRange: [-100, 0],
     outputRange: [1.2, 1],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
+  const formatHtmlContent = (html) => {
+    if (!html) return "";
 
- // Enhanced HTML styling with MINIMAL spacing
-const htmlStyles = {
-  body: {
-    fontFamily: "Outfit-Regular",
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.text.primary,
-    lineHeight: 22,
-    margin: 0,
-    padding: 0,
-  },
+    let formattedHtml = html.trim();
 
-  /* HEADINGS — no top margins (hero already shows title) */
-  h1: {
-    fontFamily: "Outfit-Bold",
-    fontSize: theme.typography.fontSize["3xl"],
-    color: theme.colors.text.primary,
-    marginTop: 0,
-    marginBottom: 6,
-    lineHeight: 32,
-  },
-  h2: {
-    fontFamily: "Outfit-SemiBold",
-    fontSize: theme.typography.fontSize.xl,
-    color: theme.colors.text.primary,
-    marginTop: 8,
-    marginBottom: 4,
-    lineHeight: 26,
-  },
-  h3: {
-    fontFamily: "Outfit-Medium",
-    fontSize: theme.typography.fontSize.lg,
-    color: theme.colors.text.primary,
-    marginTop: 6,
-    marginBottom: 2,
-    lineHeight: 24,
-  },
+    // Remove ALL <br> tags
+    formattedHtml = formattedHtml.replace(/<br\s*\/?>/gi, " ");
 
-  /* PARAGRAPHS — ZERO margins (RN stacks margins) */
-  p: {
-    fontFamily: "Outfit-Regular",
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.text.secondary,
-    marginTop: 0,
-    marginBottom: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-    lineHeight: 22,
-  },
+    // Remove empty paragraphs
+    formattedHtml = formattedHtml.replace(/<p>\s*<\/p>/gi, "");
 
-  /* STRONG / EMPHASIS */
-  strong: {
-    fontFamily: "Outfit-SemiBold",
-    color: theme.colors.text.primary,
-  },
-  em: {
-    fontStyle: "italic",
-  },
+    // Remove excessive whitespace between tags
+    formattedHtml = formattedHtml.replace(/>\s+</g, "><");
 
-  /* LISTS — NO vertical margins */
-  ul: {
-    marginTop: 0,
-    marginBottom: 0,
-    paddingLeft: theme.spacing.lg,
-  },
-  ol: {
-    marginTop: 0,
-    marginBottom: 0,
-    paddingLeft: theme.spacing.lg,
-  },
-  li: {
-    fontFamily: "Outfit-Regular",
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.text.secondary,
-    marginTop: 0,
-    marginBottom: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-    lineHeight: 22,
-  },
+    // Normalize spaces inside paragraphs
+    formattedHtml = formattedHtml.replace(/\s{2,}/g, " ");
 
-  /* LINKS */
-  a: {
-    color: currentPolicy.accentColor,
-    textDecorationLine: "underline",
-    fontFamily: "Outfit-Medium",
-  },
+    return formattedHtml;
+  };
+  // Enhanced HTML styling with MINIMAL spacing
+  const htmlStyles = {
+    body: {
+      fontFamily: "Outfit-Regular",
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary,
+      lineHeight: 22,
+      margin: 0,
+      padding: 0,
+    },
 
-  /* BLOCKS */
-  div: {
-    margin: 0,
-    padding: 0,
-  },
-  span: {
-    fontFamily: "Outfit-Regular",
-  },
+    /* HEADINGS — no top margins (hero already shows title) */
+    h1: {
+      fontFamily: "Outfit-Bold",
+      fontSize: theme.typography.fontSize["3xl"],
+      color: theme.colors.text.primary,
+      marginTop: 0,
+      marginBottom: 6,
+      lineHeight: 32,
+    },
+    h2: {
+      fontFamily: "Outfit-SemiBold",
+      fontSize: theme.typography.fontSize.xl,
+      color: theme.colors.text.primary,
+      marginTop: 8,
+      marginBottom: 4,
+      lineHeight: 26,
+    },
+    h3: {
+      fontFamily: "Outfit-Medium",
+      fontSize: theme.typography.fontSize.lg,
+      color: theme.colors.text.primary,
+      marginTop: 6,
+      marginBottom: 2,
+      lineHeight: 24,
+    },
 
-  /* HARD KILL LINE BREAKS */
-  br: {
-    display: "none",
-  },
-};
+    /* PARAGRAPHS — ZERO margins (RN stacks margins) */
+    p: {
+      fontFamily: "Outfit-Regular",
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      marginTop: 0,
+      marginBottom: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      lineHeight: 22,
+    },
+
+    /* STRONG / EMPHASIS */
+    strong: {
+      fontFamily: "Outfit-SemiBold",
+      color: theme.colors.text.primary,
+    },
+    em: {
+      fontStyle: "italic",
+    },
+
+    /* LISTS — NO vertical margins */
+    ul: {
+      marginTop: 0,
+      marginBottom: 0,
+      paddingLeft: theme.spacing.lg,
+    },
+    ol: {
+      marginTop: 0,
+      marginBottom: 0,
+      paddingLeft: theme.spacing.lg,
+    },
+    li: {
+      fontFamily: "Outfit-Regular",
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      marginTop: 0,
+      marginBottom: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      lineHeight: 22,
+    },
+
+    /* LINKS */
+    a: {
+      color: currentPolicy.accentColor,
+      textDecorationLine: "underline",
+      fontFamily: "Outfit-Medium",
+    },
+
+    /* BLOCKS */
+    div: {
+      margin: 0,
+      padding: 0,
+    },
+    span: {
+      fontFamily: "Outfit-Regular",
+    },
+
+    /* HARD KILL LINE BREAKS */
+    br: {
+      display: "none",
+    },
+  };
 
   if (loading) {
     return (
@@ -212,7 +230,12 @@ const htmlStyles = {
         <View style={styles.container}>
           {/* Modern Loading State */}
           <View style={styles.loadingContainer}>
-            <View style={[styles.loadingCard, { borderColor: currentPolicy.accentColor + "30" }]}>
+            <View
+              style={[
+                styles.loadingCard,
+                { borderColor: currentPolicy.accentColor + "30" },
+              ]}
+            >
               <View
                 style={[
                   styles.loadingIconContainer,
@@ -231,7 +254,9 @@ const htmlStyles = {
                 style={{ marginTop: theme.spacing.xl }}
               />
               <Text style={styles.loadingTitle}>Loading Policy</Text>
-              <Text style={styles.loadingSubtitle}>Please wait a moment...</Text>
+              <Text style={styles.loadingSubtitle}>
+                Please wait a moment...
+              </Text>
             </View>
           </View>
         </View>
@@ -272,7 +297,10 @@ const htmlStyles = {
               <Text style={styles.errorTitle}>Connection Issue</Text>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity
-                style={[styles.retryButton, { backgroundColor: currentPolicy.accentColor }]}
+                style={[
+                  styles.retryButton,
+                  { backgroundColor: currentPolicy.accentColor },
+                ]}
                 onPress={loadPolicyData}
                 activeOpacity={0.8}
               >
@@ -355,8 +383,18 @@ const htmlStyles = {
             ]}
           >
             {/* Gradient Background */}
-            <View style={[styles.gradientBg, { backgroundColor: currentPolicy.gradient[0] }]}>
-              <View style={[styles.gradientOverlay, { backgroundColor: currentPolicy.gradient[1] }]} />
+            <View
+              style={[
+                styles.gradientBg,
+                { backgroundColor: currentPolicy.gradient[0] },
+              ]}
+            >
+              <View
+                style={[
+                  styles.gradientOverlay,
+                  { backgroundColor: currentPolicy.gradient[1] },
+                ]}
+              />
             </View>
 
             {/* Hero Content */}
@@ -407,14 +445,20 @@ const htmlStyles = {
             {/* Main Content Card */}
             <View style={styles.contentCard}>
               <View style={styles.contentHeader}>
-                <View style={[styles.contentAccent, { backgroundColor: currentPolicy.accentColor }]} />
+                <View
+                  style={[
+                    styles.contentAccent,
+                    { backgroundColor: currentPolicy.accentColor },
+                  ]}
+                />
                 <Text style={styles.contentTitle}>Policy Details</Text>
               </View>
 
               <RenderHtml
-                contentWidth={width - 80}
-                source={{ html: policyData.description }}
+                contentWidth={width - 40}
+                source={{ html: formatHtmlContent(policyData.description) }} // ✅ Now sanitized
                 tagsStyles={htmlStyles}
+                baseStyle={{ margin: 0, padding: 0 }}
                 enableExperimentalMarginCollapsing={true}
               />
             </View>
@@ -422,7 +466,12 @@ const htmlStyles = {
             {/* Key Points Card */}
             <View style={styles.keyPointsCard}>
               <View style={styles.keyPointsHeader}>
-                <View style={[styles.keyPointsIcon, { backgroundColor: currentPolicy.accentColor + "15" }]}>
+                <View
+                  style={[
+                    styles.keyPointsIcon,
+                    { backgroundColor: currentPolicy.accentColor + "15" },
+                  ]}
+                >
                   <Ionicons
                     name="bulb"
                     size={20}
@@ -432,19 +481,25 @@ const htmlStyles = {
                 <Text style={styles.keyPointsTitle}>Quick Summary</Text>
               </View>
               <Text style={styles.keyPointsText}>
-                This document outlines the terms and conditions for using Grociko services. 
-                Please read carefully to understand your rights and responsibilities.
+                This document outlines the terms and conditions for using
+                Grociko services. Please read carefully to understand your
+                rights and responsibilities.
               </Text>
             </View>
 
             {/* Help Section */}
-            <TouchableOpacity 
-              onPress={() => router.push("/help")} 
+            <TouchableOpacity
+              onPress={() => router.push("/help")}
               style={styles.helpCard}
               activeOpacity={0.7}
             >
               <View style={styles.helpContent}>
-                <View style={[styles.helpIcon, { backgroundColor: currentPolicy.accentColor + "15" }]}>
+                <View
+                  style={[
+                    styles.helpIcon,
+                    { backgroundColor: currentPolicy.accentColor + "15" },
+                  ]}
+                >
                   <Ionicons
                     name="chatbubble-ellipses"
                     size={24}
@@ -510,7 +565,7 @@ const styles = StyleSheet.create({
 
   // Floating Header
   floatingHeader: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -533,7 +588,7 @@ const styles = StyleSheet.create({
 
   // Initial Header
   initialHeader: {
-    position: 'absolute',
+    position: "absolute",
     top: theme.spacing.lg,
     left: theme.spacing.lg,
     zIndex: 100,
@@ -672,8 +727,8 @@ const styles = StyleSheet.create({
   // Hero Section
   heroSection: {
     height: 340,
-    position: 'relative',
-    overflow: 'hidden',
+    position: "relative",
+    overflow: "hidden",
   },
   gradientBg: {
     ...StyleSheet.absoluteFillObject,
@@ -738,7 +793,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text.white,
   },
   heroDecor1: {
-    position: 'absolute',
+    position: "absolute",
     top: -50,
     right: -50,
     width: 200,
@@ -747,7 +802,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   heroDecor2: {
-    position: 'absolute',
+    position: "absolute",
     bottom: -80,
     left: -80,
     width: 250,
