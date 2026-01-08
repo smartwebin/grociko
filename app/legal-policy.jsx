@@ -48,20 +48,16 @@ const LegalPolicy = () => {
       subtitle: "Our commitment to flexibility",
       icon: "refresh-circle",
       apiEndpoint: "get-cancellation-refund-policy.php",
-      // gradient: [theme.colors.secondary.main, theme.colors.secondary.dark],
       gradient: [theme.colors.primary.main, theme.colors.primary.dark],
-
-      accentColor: theme.colors.secondary.main,
+      accentColor: theme.colors.primary.main,
     },
     privacy: {
       title: "Privacy Policy",
       subtitle: "How we protect your data",
       icon: "shield-checkmark",
       apiEndpoint: "get-privacy-policy.php",
-      // gradient: ["#2196F3", "#1976D2"],
       gradient: [theme.colors.primary.main, theme.colors.primary.dark],
-
-      accentColor: "#2196F3",
+      accentColor: theme.colors.primary.main,
     },
   };
 
@@ -103,103 +99,143 @@ const LegalPolicy = () => {
     outputRange: [1.2, 1],
     extrapolate: "clamp",
   });
+
+  /**
+   * Clean and format HTML content for proper mobile display
+   * Removes MS Word artifacts, excessive spacing, and normalizes structure
+   */
   const formatHtmlContent = (html) => {
     if (!html) return "";
 
     let formattedHtml = html.trim();
 
-    // Remove ALL <br> tags
-    formattedHtml = formattedHtml.replace(/<br\s*\/?>/gi, " ");
+    // ✅ Remove MS Office XML comments and declarations
+    formattedHtml = formattedHtml.replace(/<!--\[if[^\]]*\]>[\s\S]*?<!\[endif\]-->/gi, "");
+    formattedHtml = formattedHtml.replace(/<!--[\s\S]*?-->/g, "");
 
-    // Remove empty paragraphs
-    formattedHtml = formattedHtml.replace(/<p>\s*<\/p>/gi, "");
+    // ✅ Remove MS Word classes and attributes
+    formattedHtml = formattedHtml.replace(/class="Mso[^"]*"/gi, "");
+    formattedHtml = formattedHtml.replace(/style="[^"]*mso-[^"]*"/gi, "");
+    formattedHtml = formattedHtml.replace(/lang="[^"]*"/gi, "");
+    
+    // ✅ Remove inline styles completely
+    formattedHtml = formattedHtml.replace(/style="[^"]*"/gi, "");
 
-    // Remove excessive whitespace between tags
+    // ✅ Remove span wrappers (MS Word loves these)
+    formattedHtml = formattedHtml.replace(/<span[^>]*>(.*?)<\/span>/gi, "$1");
+
+    // ✅ Remove empty paragraphs and divs
+    formattedHtml = formattedHtml.replace(/<p[^>]*>\s*<\/p>/gi, "");
+    formattedHtml = formattedHtml.replace(/<div[^>]*>\s*<\/div>/gi, "");
+
+    // ✅ Convert &nbsp; to regular spaces
+    formattedHtml = formattedHtml.replace(/&nbsp;/gi, " ");
+
+    // ✅ Remove ALL <br> tags (we use spacing via CSS)
+    formattedHtml = formattedHtml.replace(/<br\s*\/?>/gi, "");
+
+    // ✅ Normalize whitespace between tags
     formattedHtml = formattedHtml.replace(/>\s+</g, "><");
 
-    // Normalize spaces inside paragraphs
-    formattedHtml = formattedHtml.replace(/\s{2,}/g, " ");
+    // ✅ Trim whitespace inside paragraphs and list items
+    formattedHtml = formattedHtml.replace(/<p>(\s+)/gi, "<p>");
+    formattedHtml = formattedHtml.replace(/(\s+)<\/p>/gi, "</p>");
+    formattedHtml = formattedHtml.replace(/<li>(\s+)/gi, "<li>");
+    formattedHtml = formattedHtml.replace(/(\s+)<\/li>/gi, "</li>");
+
+    // ✅ Convert h6 to h2 for consistency (MS Word sometimes uses h6)
+    formattedHtml = formattedHtml.replace(/<h6([^>]*)>/gi, "<h2$1>");
+    formattedHtml = formattedHtml.replace(/<\/h6>/gi, "</h2>");
+
+    // ✅ Ensure proper spacing between sections with <br> replacement
+    // Add spacing after closing tags that should have breathing room
+    formattedHtml = formattedHtml.replace(/<\/ul>/gi, "</ul>\n");
+    formattedHtml = formattedHtml.replace(/<\/ol>/gi, "</ol>\n");
 
     return formattedHtml;
   };
-  // Enhanced HTML styling with MINIMAL spacing
+
+  // Enhanced HTML styling with proper mobile spacing
   const htmlStyles = {
     body: {
       fontFamily: "Outfit-Regular",
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
-      lineHeight: 22,
+      lineHeight: 24,
       margin: 0,
       padding: 0,
     },
 
-    /* HEADINGS — no top margins (hero already shows title) */
+    /* HEADINGS */
     h1: {
       fontFamily: "Outfit-Bold",
-      fontSize: theme.typography.fontSize["3xl"],
+      fontSize: theme.typography.fontSize["2xl"],
       color: theme.colors.text.primary,
       marginTop: 0,
-      marginBottom: 6,
+      marginBottom: theme.spacing.md,
       lineHeight: 32,
     },
     h2: {
       fontFamily: "Outfit-SemiBold",
-      fontSize: theme.typography.fontSize.xl,
+      fontSize: theme.typography.fontSize.lg,
       color: theme.colors.text.primary,
-      marginTop: 8,
-      marginBottom: 4,
+      marginTop: theme.spacing.xl,
+      marginBottom: theme.spacing.sm,
       lineHeight: 26,
     },
     h3: {
       fontFamily: "Outfit-Medium",
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
-      marginTop: 6,
-      marginBottom: 2,
+      marginTop: theme.spacing.lg,
+      marginBottom: theme.spacing.xs,
       lineHeight: 24,
     },
 
-    /* PARAGRAPHS — ZERO margins (RN stacks margins) */
+    /* PARAGRAPHS */
     p: {
       fontFamily: "Outfit-Regular",
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
       marginTop: 0,
-      marginBottom: 0,
-      paddingTop: 0,
-      paddingBottom: 0,
-      lineHeight: 22,
+      marginBottom: theme.spacing.md,
+      lineHeight: 24,
     },
 
     /* STRONG / EMPHASIS */
     strong: {
       fontFamily: "Outfit-SemiBold",
       color: theme.colors.text.primary,
+      fontWeight: "600",
+    },
+    b: {
+      fontFamily: "Outfit-SemiBold",
+      color: theme.colors.text.primary,
+      fontWeight: "600",
     },
     em: {
       fontStyle: "italic",
     },
 
-    /* LISTS — NO vertical margins */
+    /* LISTS */
     ul: {
-      marginTop: 0,
-      marginBottom: 0,
-      paddingLeft: theme.spacing.lg,
+      marginTop: theme.spacing.xs,
+      marginBottom: theme.spacing.lg,
+      paddingLeft: theme.spacing.xl,
     },
     ol: {
-      marginTop: 0,
-      marginBottom: 0,
-      paddingLeft: theme.spacing.lg,
+      marginTop: theme.spacing.xs,
+      marginBottom: theme.spacing.lg,
+      paddingLeft: theme.spacing.xl,
     },
     li: {
       fontFamily: "Outfit-Regular",
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
       marginTop: 0,
-      marginBottom: 0,
-      paddingTop: 0,
-      paddingBottom: 0,
-      lineHeight: 22,
+      marginBottom: theme.spacing.sm,
+      lineHeight: 24,
+      paddingLeft: theme.spacing.xs,
     },
 
     /* LINKS */
@@ -209,18 +245,18 @@ const LegalPolicy = () => {
       fontFamily: "Outfit-Medium",
     },
 
-    /* BLOCKS */
+    /* CONTAINERS */
     div: {
       margin: 0,
       padding: 0,
     },
-    span: {
-      fontFamily: "Outfit-Regular",
-    },
 
-    /* HARD KILL LINE BREAKS */
+    /* KILL UNWANTED ELEMENTS */
     br: {
       display: "none",
+    },
+    span: {
+      fontFamily: "Outfit-Regular",
     },
   };
 
@@ -455,11 +491,12 @@ const LegalPolicy = () => {
               </View>
 
               <RenderHtml
-                contentWidth={width - 40}
-                source={{ html: formatHtmlContent(policyData.description) }} // ✅ Now sanitized
+                contentWidth={width - 80}
+                source={{ html: formatHtmlContent(policyData.description) }}
                 tagsStyles={htmlStyles}
                 baseStyle={{ margin: 0, padding: 0 }}
                 enableExperimentalMarginCollapsing={true}
+                systemFonts={["Outfit-Regular", "Outfit-Medium", "Outfit-SemiBold", "Outfit-Bold"]}
               />
             </View>
 

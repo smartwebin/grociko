@@ -99,11 +99,7 @@ const About = () => {
       setLoading(true);
       const response = await getAboutUs();
 
-      // console.log('📦 Full API Response:', response);
-
       if (response.success && response.data) {
-        // console.log('📋 Loaded About Data:', response.data);
-
         if (response.data && (response.data.title || response.data.description)) {
           setAboutData(response.data);
         } else {
@@ -134,95 +130,157 @@ const About = () => {
     Linking.openURL('https://grociko.com/download');
   };
 
- // Clean and format HTML content - COMPLETELY FIXED VERSION
-const formatHtmlContent = (html) => {
-  if (!html) return '';
-  
-  let formattedHtml = html.trim();
-  
-  // Remove ALL <br> tags completely (they're causing spacing issues)
-  formattedHtml = formattedHtml.replace(/<br\s*\/?>/gi, ' ');
-  
-  // Remove empty paragraphs
-  formattedHtml = formattedHtml.replace(/<p>\s*<\/p>/gi, '');
-  
-  // Remove excessive whitespace between tags
-  formattedHtml = formattedHtml.replace(/>\s+</g, '><');
-  
-  // Normalize spaces inside paragraphs
-  formattedHtml = formattedHtml.replace(/\s{2,}/g, ' ');
-  
-  return formattedHtml;
-};
+  /**
+   * Clean and format HTML content for proper mobile display
+   * Removes MS Word artifacts, excessive spacing, and normalizes structure
+   */
+  const formatHtmlContent = (html) => {
+    if (!html) return '';
 
-// HTML rendering configuration - ULTRA MINIMAL SPACING VERSION
-const htmlBaseStyle = {
-  fontSize: theme.typography.fontSize.base,
-  fontFamily: 'Outfit-Regular',
-  color: theme.colors.text.secondary,
-  lineHeight: theme.typography.fontSize.base * 1.35, // Even tighter line height
-};
+    let formattedHtml = html.trim();
 
-const htmlTagsStyles = {
-  body: {
-    ...htmlBaseStyle,
-    margin: 0,
-    padding: 0,
-  },
-  p: {
-    ...htmlBaseStyle,
-    marginBottom: 0, // ULTRA minimal - just 2px between paragraphs
-    marginTop: 0,
-    paddingBottom: 0,
-    paddingTop: 0,
-  },
-  span: {
-    ...htmlBaseStyle,
-    margin: 0,
-  },
-  div: {
-    ...htmlBaseStyle,
-    marginBottom: 0,
-    marginTop: 0,
-  },
-  br: {
-    display: 'none', // Completely hide <br> tags
-  },
-  h1: {
-    fontSize: theme.typography.fontSize.xl,
-    fontFamily: 'Outfit-Bold',
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
-  },
-  h2: {
-    fontSize: theme.typography.fontSize.lg,
-    fontFamily: 'Outfit-SemiBold',
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs,
-    marginTop: theme.spacing.md,
-  },
-  h3: {
+    // ✅ Remove MS Office XML comments and declarations
+    formattedHtml = formattedHtml.replace(/<!--\[if[^\]]*\]>[\s\S]*?<!\[endif\]-->/gi, '');
+    formattedHtml = formattedHtml.replace(/<!--[\s\S]*?-->/g, '');
+
+    // ✅ Remove MS Word classes and attributes
+    formattedHtml = formattedHtml.replace(/class="Mso[^"]*"/gi, '');
+    formattedHtml = formattedHtml.replace(/style="[^"]*mso-[^"]*"/gi, '');
+    formattedHtml = formattedHtml.replace(/lang="[^"]*"/gi, '');
+    
+    // ✅ Remove inline styles completely
+    formattedHtml = formattedHtml.replace(/style="[^"]*"/gi, '');
+
+    // ✅ Remove span wrappers (MS Word loves these)
+    formattedHtml = formattedHtml.replace(/<span[^>]*>(.*?)<\/span>/gi, '$1');
+
+    // ✅ Remove empty paragraphs and divs
+    formattedHtml = formattedHtml.replace(/<p[^>]*>\s*<\/p>/gi, '');
+    formattedHtml = formattedHtml.replace(/<div[^>]*>\s*<\/div>/gi, '');
+
+    // ✅ Convert &nbsp; to regular spaces
+    formattedHtml = formattedHtml.replace(/&nbsp;/gi, ' ');
+
+    // ✅ Remove ALL <br> tags (we use spacing via CSS)
+    formattedHtml = formattedHtml.replace(/<br\s*\/?>/gi, '');
+
+    // ✅ Normalize whitespace between tags
+    formattedHtml = formattedHtml.replace(/>\s+</g, '><');
+
+    // ✅ Trim whitespace inside paragraphs and list items
+    formattedHtml = formattedHtml.replace(/<p>(\s+)/gi, '<p>');
+    formattedHtml = formattedHtml.replace(/(\s+)<\/p>/gi, '</p>');
+    formattedHtml = formattedHtml.replace(/<li>(\s+)/gi, '<li>');
+    formattedHtml = formattedHtml.replace(/(\s+)<\/li>/gi, '</li>');
+
+    // ✅ Ensure proper spacing between sections
+    formattedHtml = formattedHtml.replace(/<\/ul>/gi, '</ul>\n');
+    formattedHtml = formattedHtml.replace(/<\/ol>/gi, '</ol>\n');
+
+    return formattedHtml;
+  };
+
+  // HTML rendering configuration with proper mobile spacing
+  const htmlBaseStyle = {
     fontSize: theme.typography.fontSize.base,
-    fontFamily: 'Outfit-SemiBold',
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs,
-    marginTop: theme.spacing.sm,
-  },
-  ul: {
-  margin: 0,
-  paddingLeft: theme.spacing.lg,
-},
-ol: {
-  margin: 0,
-  paddingLeft: theme.spacing.lg,
-},
-li: {
-  marginBottom: 0,
-  paddingBottom: 0,
-},
+    fontFamily: 'Outfit-Regular',
+    color: theme.colors.text.secondary,
+    lineHeight: 24,
+  };
 
-};
+  const htmlTagsStyles = {
+    body: {
+      ...htmlBaseStyle,
+      margin: 0,
+      padding: 0,
+    },
+    
+    /* PARAGRAPHS */
+    p: {
+      ...htmlBaseStyle,
+      marginTop: 0,
+      marginBottom: theme.spacing.md,
+      paddingTop: 0,
+      paddingBottom: 0,
+    },
+    
+    /* HEADINGS */
+    h1: {
+      fontSize: theme.typography.fontSize['2xl'],
+      fontFamily: 'Outfit-Bold',
+      color: theme.colors.text.primary,
+      marginTop: theme.spacing.xl,
+      marginBottom: theme.spacing.md,
+      lineHeight: 32,
+    },
+    h2: {
+      fontSize: theme.typography.fontSize.lg,
+      fontFamily: 'Outfit-SemiBold',
+      color: theme.colors.text.primary,
+      marginTop: theme.spacing.lg,
+      marginBottom: theme.spacing.sm,
+      lineHeight: 26,
+    },
+    h3: {
+      fontSize: theme.typography.fontSize.base,
+      fontFamily: 'Outfit-SemiBold',
+      color: theme.colors.text.primary,
+      marginTop: theme.spacing.md,
+      marginBottom: theme.spacing.xs,
+      lineHeight: 24,
+    },
+    
+    /* LISTS */
+    ul: {
+      marginTop: theme.spacing.xs,
+      marginBottom: theme.spacing.lg,
+      paddingLeft: theme.spacing.xl,
+    },
+    ol: {
+      marginTop: theme.spacing.xs,
+      marginBottom: theme.spacing.lg,
+      paddingLeft: theme.spacing.xl,
+    },
+    li: {
+      fontFamily: 'Outfit-Regular',
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      marginTop: 0,
+      marginBottom: theme.spacing.sm,
+      lineHeight: 24,
+      paddingLeft: theme.spacing.xs,
+    },
+    
+    /* EMPHASIS */
+    strong: {
+      fontFamily: 'Outfit-SemiBold',
+      color: theme.colors.text.primary,
+      fontWeight: '600',
+    },
+    b: {
+      fontFamily: 'Outfit-SemiBold',
+      color: theme.colors.text.primary,
+      fontWeight: '600',
+    },
+    em: {
+      fontStyle: 'italic',
+    },
+    
+    /* CONTAINERS */
+    div: {
+      margin: 0,
+      padding: 0,
+    },
+    span: {
+      fontFamily: 'Outfit-Regular',
+    },
+    
+    /* KILL UNWANTED ELEMENTS */
+    br: {
+      display: 'none',
+    },
+  };
+
   // Beautiful Loading State
   if (loading) {
     return (
@@ -378,6 +436,7 @@ li: {
                     tagsStyles={htmlTagsStyles}
                     baseStyle={htmlBaseStyle}
                     enableExperimentalMarginCollapsing={true}
+                    systemFonts={['Outfit-Regular', 'Outfit-Medium', 'Outfit-SemiBold', 'Outfit-Bold']}
                   />
                 </View>
               )}
@@ -389,9 +448,9 @@ li: {
                     size={16}
                     color={theme.colors.text.tertiary}
                   />
-               {/* {   <Text style={styles.infoText}>
+                  <Text style={styles.infoText}>
                     Established: {aboutData.created_date}
-                  </Text>} */}
+                  </Text>
                 </View>
               )}
             </View>
@@ -419,8 +478,6 @@ li: {
               ))}
             </View>
           </View>
-
-        
 
           {/* Actions Section */}
           <View style={styles.section}>
