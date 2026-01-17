@@ -97,7 +97,7 @@ const makeRequest = async (endpoint, options = {}) => {
     } catch (parseError) {
       console.error(
         "Response is not valid JSON:",
-        responseText.substring(0, 200)
+        responseText.substring(0, 200),
       );
       return {
         success: false,
@@ -143,7 +143,7 @@ export const saveUserData = async (userData, jwt = null) => {
   try {
     await SecureStore.setItemAsync(
       STORAGE_KEYS.USER_DATA,
-      JSON.stringify(userData)
+      JSON.stringify(userData),
     );
 
     // Save JWT token - either from userData or passed separately
@@ -155,7 +155,7 @@ export const saveUserData = async (userData, jwt = null) => {
     if (userData.id) {
       await SecureStore.setItemAsync(
         STORAGE_KEYS.USER_ID,
-        userData.id.toString()
+        userData.id.toString(),
       );
     }
 
@@ -231,7 +231,7 @@ export const signupUser = async (formData) => {
     console.log("📤 Signup Request Headers:", headers);
     console.log(
       "📤 FormData keys:",
-      Array.from(formData._parts || []).map(([key]) => key)
+      Array.from(formData._parts || []).map(([key]) => key),
     );
 
     const response = await makeRequest("/sign-up.php", {
@@ -793,7 +793,7 @@ export const getUserAddresses = async (userId) => {
       {
         method: "GET",
         headers,
-      }
+      },
     );
 
     if (response.success && response.data?.response_code === 200) {
@@ -1001,7 +1001,7 @@ export const getDeliveryCharge = async (addressId) => {
       {
         method: "GET",
         headers,
-      }
+      },
     );
 
     if (response.success && response.data?.response_code === 200) {
@@ -1122,22 +1122,40 @@ export const createOrder = async (orderData) => {
 /**
  * Get User Orders
  */
-export const getUserOrders = async (userId, statusFilter = null) => {
+export const getUserOrders = async (
+  userId,
+  statusFilter = null,
+  pagination = {},
+) => {
   try {
     const headers = {
       Authorization: getBasicAuthHeader(),
       Accept: "application/json",
     };
 
-    let url = `/get-orders.php?user_id=${userId}`;
+    // Build query parameters
+    const queryParams = new URLSearchParams();
+    queryParams.append("user_id", userId);
+
     if (statusFilter) {
-      url += `&status=${statusFilter}`;
+      queryParams.append("status", statusFilter);
     }
+
+    // Add pagination parameters
+    if (pagination.limit) {
+      queryParams.append("limit", pagination.limit);
+    }
+    if (pagination.page) {
+      queryParams.append("page", pagination.page);
+    }
+
+    const url = `/get-orders.php?${queryParams.toString()}`;
 
     console.log(
       "📦 Fetching orders for user:",
       userId,
-      statusFilter ? `(${statusFilter})` : ""
+      statusFilter ? `(${statusFilter})` : "",
+      pagination.page ? `Page: ${pagination.page}` : "",
     );
 
     const response = await makeRequest(url, {
@@ -1149,6 +1167,7 @@ export const getUserOrders = async (userId, statusFilter = null) => {
       return {
         success: true,
         data: response.data.data || [],
+        pagination: response.data.pagination, // Include pagination metadata
       };
     } else {
       return {
@@ -1316,7 +1335,7 @@ export const createPaymentIntent = async (paymentData) => {
     formData.append("currency", String(paymentData.currency || "gbp"));
     formData.append(
       "description",
-      String(paymentData.description || "Grociko Order Payment")
+      String(paymentData.description || "Grociko Order Payment"),
     );
 
     if (paymentData.metadata) {
@@ -1378,7 +1397,7 @@ export const confirmPaymentAndCreateOrder = async (orderData) => {
 
     console.log(
       "💳 Confirming payment and creating order:",
-      orderData.payment_intent_id
+      orderData.payment_intent_id,
     );
 
     const response = await makeRequest("/confirm-payment-order.php", {
@@ -1426,7 +1445,7 @@ export const getTransactionDetails = async (orderId) => {
       {
         method: "GET",
         headers,
-      }
+      },
     );
 
     if (response.success && response.data?.response_code === 200) {
@@ -1468,7 +1487,7 @@ export const lookupPostcode = async (postcode) => {
       {
         method: "GET",
         headers,
-      }
+      },
     );
 
     if (response.success && response.data?.response_code === 200) {
@@ -1607,7 +1626,7 @@ export const validateOfferCode = async (offerCode, orderTotal) => {
       return {
         success: false,
         error: `Minimum order of £${offer.minimum_order.toFixed(
-          2
+          2,
         )} required for this promo code`,
         data: null,
       };
@@ -1634,7 +1653,7 @@ export const verifyStock = async (productData) => {
       "product_data",
       typeof product_data === "string"
         ? product_data
-        : JSON.stringify(product_data)
+        : JSON.stringify(product_data),
     );
 
     const headers = {
@@ -1821,4 +1840,3 @@ export const deleteUser = async (userId) => {
 };
 
 export { STORAGE_KEYS };
-

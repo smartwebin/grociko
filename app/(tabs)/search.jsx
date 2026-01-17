@@ -41,7 +41,9 @@ const Search = () => {
   const [subcategories, setSubcategories] = useState({});
   const [brandOptions, setBrandOptions] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
-
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   // Sort options
   const sortOptions = [
     { id: "name", name: "Name (A-Z)" },
@@ -116,58 +118,94 @@ const Search = () => {
       setLoading(false);
     }
   };
+  const handleLoadMore = () => {
+    if (!isLoadingMore && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
 
-  // Load products from API
-  const loadProducts = useCallback(async (filters = {}) => {
-    try {
-      setProductsLoading(true);
+      const filters = {};
+      if (selectedFilter !== "all") filters.cat_id = selectedFilter;
+      if (selectedSubcategory !== "all") filters.sub_id = selectedSubcategory;
+      if (filterOptions.brand !== "all") filters.brand_id = filterOptions.brand;
 
-      const apiFilters = {
-        status: "active",
-        ...filters,
-      };
-
-      const response = await getProducts(apiFilters);
-
-      if (response.success && response.data && Array.isArray(response.data)) {
-        const products = response.data.map((prod) => ({
-          id: parseInt(prod.id),
-          name: prod.name,
-          description: prod.description || "",
-          vat_cat: prod.vat_cat || "",
-          tag:prod.tag,
-          tag_color:prod.tag_color,
-          quantity: prod.quantity || 0,
-          unit: prod.unit || prod.weight || "1 unit",
-          weight: prod.weight || "",
-          quantity: prod.quantity || "",
-          mrp: parseFloat(prod.mrp) || 0,
-          sale_price: parseFloat(prod.sale_price) || 0,
-          sellingPrice: parseFloat(prod.sale_price) || 0,
-          image: prod.image,
-          sub_images: prod.sub_images || [],
-          cat_id: prod.cat_id,
-          sub_id: prod.sub_id,
-          brand_id: prod.brand_id,
-          category: prod.category || "",
-          subcategory: prod.subcategory || "",
-          brand: prod.brand || "",
-          tag: prod.tag || "",
-          featured: prod.featured === "yes",
-          status: prod.status || "",
-        }));
-
-        setAllProducts(products);
-      } else {
-        setAllProducts([]);
-      }
-    } catch (error) {
-      console.error("❌ Error loading products:", error);
-      setAllProducts([]);
-    } finally {
-      setProductsLoading(false);
+      loadProducts(filters, nextPage, true); // true = append to existing
     }
-  }, []);
+  };
+  // Load products from API
+  const loadProducts = useCallback(
+    async (filters = {}, pageNum = 1, append = false) => {
+      try {
+        // Show appropriate loader
+        if (pageNum === 1) {
+          setProductsLoading(true);
+        } else {
+          setIsLoadingMore(true);
+        }
+
+        const apiFilters = {
+          status: "active",
+          limit: 20,
+          page: pageNum,
+          ...filters,
+        };
+
+        const response = await getProducts(apiFilters);
+
+        if (response.success && response.data && Array.isArray(response.data)) {
+          const products = response.data.map((prod) => ({
+            id: parseInt(prod.id),
+            name: prod.name,
+            description: prod.description || "",
+            vat_cat: prod.vat_cat || "",
+            tag: prod.tag,
+            tag_color: prod.tag_color,
+            quantity: prod.quantity || 0,
+            unit: prod.unit || prod.weight || "1 unit",
+            weight: prod.weight || "",
+            mrp: parseFloat(prod.mrp) || 0,
+            sale_price: parseFloat(prod.sale_price) || 0,
+            sellingPrice: parseFloat(prod.sale_price) || 0,
+            image: prod.image,
+            sub_images: prod.sub_images || [],
+            cat_id: prod.cat_id,
+            sub_id: prod.sub_id,
+            brand_id: prod.brand_id,
+            category: prod.category || "",
+            subcategory: prod.subcategory || "",
+            brand: prod.brand || "",
+            featured: prod.featured === "yes",
+            status: prod.status || "",
+          }));
+
+          // Either append to existing products or replace them
+          if (append) {
+            setAllProducts((prev) => [...prev, ...products]);
+          } else {
+            setAllProducts(products);
+          }
+
+          // Check if there are more products to load
+          // If we got less than 20 products, there are no more
+          setHasMore(products.length === 20);
+        } else {
+          if (!append) {
+            setAllProducts([]);
+          }
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error("❌ Error loading products:", error);
+        if (!append) {
+          setAllProducts([]);
+        }
+        setHasMore(false);
+      } finally {
+        setProductsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [],
+  );
 
   const resetFilters = () => {
     setFilterOptions({
@@ -222,26 +260,20 @@ const Search = () => {
       }
 
       loadProducts();
-    }, [searchParams.cat_id, searchParams.brand_id, loadProducts])
+    }, [searchParams.cat_id, searchParams.brand_id, loadProducts]),
   );
 
   useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+
     const filters = {};
+    if (selectedFilter !== "all") filters.cat_id = selectedFilter;
+    if (selectedSubcategory !== "all") filters.sub_id = selectedSubcategory;
+    if (filterOptions.brand !== "all") filters.brand_id = filterOptions.brand;
 
-    if (selectedFilter !== "all") {
-      filters.cat_id = selectedFilter;
-    }
-
-    if (selectedSubcategory !== "all") {
-      filters.sub_id = selectedSubcategory;
-    }
-
-    if (filterOptions.brand !== "all") {
-      filters.brand_id = filterOptions.brand;
-    }
-
-    loadProducts(filters);
-  }, [selectedFilter, selectedSubcategory, filterOptions.brand, loadProducts]);
+    loadProducts(filters, 1, false); // false = replace existing
+  }, [selectedFilter, selectedSubcategory, filterOptions.brand]);
 
   // Filter and sort products
   const filteredAndSortedProducts = allProducts
@@ -449,7 +481,7 @@ const Search = () => {
                   id: "all",
                   name: "All",
                   count: allProducts.filter(
-                    (p) => p.cat_id.toString() === selectedFilter
+                    (p) => p.cat_id.toString() === selectedFilter,
                   ).length,
                 },
                 ...getCurrentSubcategories(),
@@ -493,6 +525,17 @@ const Search = () => {
               }
               contentContainerStyle={styles.productsList}
               columnWrapperStyle={styles.row}
+              onEndReached={handleLoadMore}
+              onEndReachedThreshold={0.5} // Load when 50% from bottom
+              ListFooterComponent={() =>
+                isLoadingMore ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors.primary.main}
+                    style={{ marginVertical: 20 }}
+                  />
+                ) : null
+              }
             />
           ) : (
             <View style={styles.noResults}>
@@ -646,7 +689,7 @@ const Search = () => {
                               ...filterOptions.priceRange,
                               min: Math.min(
                                 value,
-                                filterOptions.priceRange.max - 100
+                                filterOptions.priceRange.max - 100,
                               ),
                             },
                           })
@@ -675,7 +718,7 @@ const Search = () => {
                               ...filterOptions.priceRange,
                               max: Math.max(
                                 value,
-                                filterOptions.priceRange.min + 100
+                                filterOptions.priceRange.min + 100,
                               ),
                             },
                           })

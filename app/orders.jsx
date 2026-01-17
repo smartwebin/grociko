@@ -28,17 +28,26 @@ const Orders = () => {
   const [userData, setUserData] = useState(null);
   const [ongoingOrders, setOngoingOrders] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
-
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   // Load orders when screen focuses
   useFocusEffect(
     useCallback(() => {
-      loadOrders();
-    }, [])
+      setPage(1);
+      setHasMore(true);
+      loadOrders(1, false); // false = replace existing
+    }, []),
   );
 
-  const loadOrders = async () => {
+  const loadOrders = async (pageNum = 1, append = false) => {
     try {
-      setLoading(true);
+      // Show appropriate loader
+      if (pageNum === 1) {
+        setLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
 
       // Get user data
       const user = await getUserData();
@@ -46,29 +55,73 @@ const Orders = () => {
         Alert.alert(
           "Authentication Required",
           "Please sign in to view your orders",
-          [{ text: "OK", onPress: () => router.replace("/signin") }]
+          [{ text: "OK", onPress: () => router.replace("/signin") }],
         );
         return;
       }
-      setUserData(user);
 
-      // Fetch ongoing orders
-      const ongoingResponse = await getUserOrders(user.id, "ongoing");
-      if (ongoingResponse.success) {
-        setOngoingOrders(ongoingResponse.data);
+      if (pageNum === 1) {
+        setUserData(user);
       }
 
-      // Fetch completed orders
-      const completedResponse = await getUserOrders(user.id, "completed");
+      // Fetch ongoing orders with pagination
+      const ongoingResponse = await getUserOrders(user.id, "ongoing", {
+        limit: 20,
+        page: pageNum,
+      });
+
+      if (ongoingResponse.success) {
+        if (append) {
+          setOngoingOrders((prev) => [...prev, ...ongoingResponse.data]);
+        } else {
+          setOngoingOrders(ongoingResponse.data);
+        }
+
+        // Check if there are more orders
+        if (activeTab === "ongoing") {
+          setHasMore(ongoingResponse.data.length === 20);
+        }
+      }
+
+      // Fetch completed orders with pagination
+      const completedResponse = await getUserOrders(user.id, "completed", {
+        limit: 20,
+        page: pageNum,
+      });
+
       if (completedResponse.success) {
-        setCompletedOrders(completedResponse.data);
+        if (append) {
+          setCompletedOrders((prev) => [...prev, ...completedResponse.data]);
+        } else {
+          setCompletedOrders(completedResponse.data);
+        }
+
+        // Check if there are more orders
+        if (activeTab === "completed") {
+          setHasMore(completedResponse.data.length === 20);
+        }
       }
     } catch (error) {
       console.error("Error loading orders:", error);
       Alert.alert("Error", "Failed to load orders");
+      setHasMore(false);
     } finally {
       setLoading(false);
+      setIsLoadingMore(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    if (!isLoadingMore && hasMore && !loading) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      loadOrders(nextPage, true); // true = append to existing
+    }
+  };
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setPage(1);
+    setHasMore(true);
   };
 
   const getCurrentOrders = () => {
@@ -120,11 +173,11 @@ const Orders = () => {
                   text: "View Cart",
                   onPress: () => router.push("/cart"),
                 },
-              ]
+              ],
             );
           },
         },
-      ]
+      ],
     );
   };
 
@@ -325,6 +378,17 @@ const Orders = () => {
           contentContainerStyle={styles.ordersListContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={renderEmptyState}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5} // Load when 50% from bottom
+          ListFooterComponent={() =>
+            isLoadingMore ? (
+              <ActivityIndicator
+                size="small"
+                color={theme.colors.primary.main}
+                style={{ marginVertical: 20 }}
+              />
+            ) : null
+          }
         />
 
         {/* Order Details Modal */}
@@ -420,7 +484,7 @@ const Orders = () => {
                                 <Text style={styles.modalItemBreakdownTotal}>
                                   Total: £
                                   {parseFloat(
-                                    item.total_price || item.price || 0
+                                    item.total_price || item.price || 0,
                                   ).toFixed(2)}
                                 </Text>
                               </View>
@@ -447,7 +511,7 @@ const Orders = () => {
                           <Text style={styles.billingValue}>
                             £
                             {parseFloat(selectedOrder.deliveryFee || 0).toFixed(
-                              2
+                              2,
                             )}
                           </Text>
                         </View>
@@ -476,10 +540,10 @@ const Orders = () => {
                           >
                             {parseFloat(selectedOrder.discount) > 0
                               ? `- £${parseFloat(
-                                  selectedOrder.discount
+                                  selectedOrder.discount,
                                 ).toFixed(2)}`
                               : `£${parseFloat(
-                                  selectedOrder.discount || 0
+                                  selectedOrder.discount || 0,
                                 ).toFixed(2)}`}
                           </Text>
                         </View>
@@ -492,7 +556,7 @@ const Orders = () => {
                           <Text style={styles.billingTotalValue}>
                             £
                             {parseFloat(selectedOrder.totalAmount || 0).toFixed(
-                              2
+                              2,
                             )}
                           </Text>
                         </View>
@@ -504,9 +568,9 @@ const Orders = () => {
                             {selectedOrder.paymentMethod == "online_payment"
                               ? "Online Payment"
                               : selectedOrder.paymentMethod ==
-                                "click_and_collect"
-                              ? "Click & Collect"
-                              : "N/A"}
+                                  "click_and_collect"
+                                ? "Click & Collect"
+                                : "N/A"}
                           </Text>
                         </View>
                       </View>

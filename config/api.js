@@ -3,6 +3,8 @@ export const API_CONFIG = {
   // Base URLs
   BASE_URL: "https://grociko.co.uk/api",
   BASE_IMG_URL: "https://grociko.co.uk/photos",
+  // BASE_URL: "https://work.phpwebsites.in/grociko/api",
+  // BASE_IMG_URL: "https://work.phpwebsites.in/grociko/photos",
   // BASE_URL: "http://192.168.1.3/Zen/grociko/api",
   // BASE_IMG_URL: "http://192.168.1.3/Zen/grociko/photos",
 
@@ -11,7 +13,6 @@ export const API_CONFIG = {
     // Jobseeker endpoints
     SIGNUP: "/sign-up.php",
     LOGIN: "/login.php",
-    
   },
 
   // Request headers
@@ -98,14 +99,14 @@ export const validateFile = (file, type = "image") => {
   // Check file size if available
   if (file.fileSize && file.fileSize > maxSizes[type]) {
     errors.push(
-      `File size must be less than ${maxSizes[type] / (1024 * 1024)}MB`
+      `File size must be less than ${maxSizes[type] / (1024 * 1024)}MB`,
     );
   }
 
   // Check file type if available
   if (file.mimeType && !allowedTypes[type].includes(file.mimeType)) {
     errors.push(
-      `Invalid file type. Allowed types: ${allowedTypes[type].join(", ")}`
+      `Invalid file type. Allowed types: ${allowedTypes[type].join(", ")}`,
     );
   }
 
