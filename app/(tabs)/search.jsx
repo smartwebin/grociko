@@ -144,7 +144,7 @@ const Search = () => {
 
         const apiFilters = {
           status: "active",
-          limit: 20,
+          limit: 50,
           page: pageNum,
           ...filters,
         };
@@ -185,8 +185,8 @@ const Search = () => {
           }
 
           // Check if there are more products to load
-          // If we got less than 20 products, there are no more
-          setHasMore(products.length === 20);
+          // If we got less than 50 products, there are no more
+          setHasMore(products.length === 50);
         } else {
           if (!append) {
             setAllProducts([]);
