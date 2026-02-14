@@ -61,7 +61,7 @@ const AddAddress = () => {
   useFocusEffect(
     useCallback(() => {
       loadUserAndAddress();
-    }, [addressId])
+    }, [addressId]),
   );
 
   const showToast = (message, type = "error") => {
@@ -100,7 +100,7 @@ const AddAddress = () => {
         const response = await getUserAddresses(user.id);
         if (response.success) {
           const address = response.data.find(
-            (addr) => addr.id.toString() === addressId.toString()
+            (addr) => addr.id.toString() === addressId.toString(),
           );
           if (address) {
             setPostcodeInput(address.pincode || "");
@@ -141,7 +141,7 @@ const AddAddress = () => {
     if (!postcodePattern.test(postcodeInput.trim())) {
       showToast(
         "Please enter a valid UK postcode format (e.g., SW1A 1AA, M1 1AE, B33 8TH)",
-        "error"
+        "error",
       );
       return;
     }
@@ -151,7 +151,7 @@ const AddAddress = () => {
       const response = await lookupPostcode(postcodeInput);
 
       if (response.success && response.data.length > 0) {
-                  console.log("response.data",response.data)
+        console.log("response.data", response.data);
 
         setFoundAddresses(response.data);
         setAddressListModalVisible(true);
@@ -166,50 +166,49 @@ const AddAddress = () => {
       setLookingUp(false);
     }
   };
-const formatAddressLines = ({ line_1, line_2 }) => {
-  let newLine1 = "";
-  let newLine2 = "";
-  let newLine3 = "";
+  const formatAddressLines = ({ line_1, line_2 }) => {
+    let newLine1 = "";
+    let newLine2 = "";
+    let newLine3 = "";
 
-  if (line_2 && line_2.trim() !== "") {
-    // Case 1: line_2 exists → shift
-    newLine2 = line_1;
-    newLine3 = line_2;
-  } else {
-    // Case 2: no line_2 → move line_1 to line_2
-    newLine3 = line_1;
-    newLine2 = "";
-  }
+    if (line_2 && line_2.trim() !== "") {
+      // Case 1: line_2 exists → shift
+      newLine2 = line_1;
+      newLine3 = line_2;
+    } else {
+      // Case 2: no line_2 → move line_1 to line_2
+      newLine3 = line_1;
+      newLine2 = "";
+    }
 
-  return {
-    line_1: newLine1,
-    line_2: newLine2,
-    line_3: newLine3,
+    return {
+      line_1: newLine1,
+      line_2: newLine2,
+      line_3: newLine3,
+    };
   };
-};
 
   const handleSelectFoundAddress = (address) => {
-  setSelectedFoundAddress(address);
+    setSelectedFoundAddress(address);
 
-  const formatted = formatAddressLines({
-    line_1: address.line_1,
-    line_2: address.line_2
-  });
+    const formatted = formatAddressLines({
+      line_1: address.line_1,
+      line_2: address.line_2,
+    });
 
-  setFormData({
-    ...formatted,
-    post_town: address.post_town || "",
-    city: address.post_town || address.city || "",
-    pincode: address.postcode || postcodeInput,
-    county: address.county || "",
-    district: address.district || "",
-    ward: address.ward || "",
-    landmark: formData.landmark || "",
-  });
+    setFormData({
+      ...formatted,
+      post_town: address.post_town || "",
+      city: address.post_town || address.city || "",
+      pincode: address.postcode || postcodeInput,
+      county: address.county || "",
+      district: address.district || "",
+      ward: address.ward || "",
+      landmark: formData.landmark || "",
+    });
 
-  setAddressListModalVisible(false);
-};
-
+    setAddressListModalVisible(false);
+  };
 
   const handleSave = async () => {
     // Validation
@@ -221,7 +220,7 @@ const formatAddressLines = ({ line_1, line_2 }) => {
     ) {
       showToast(
         "Please fill all required fields (Address Line 1, City, Postcode, Landmark)",
-        "error"
+        "error",
       );
       return;
     }
@@ -277,33 +276,42 @@ const formatAddressLines = ({ line_1, line_2 }) => {
     }
   };
 
-  const renderFoundAddressItem = ({ item, index }) => (
-    <TouchableOpacity
-      style={styles.foundAddressItem}
-      onPress={() => handleSelectFoundAddress(item)}
-    >
-      <View style={styles.foundAddressContent}>
-        <Ionicons
-          name="location-outline"
-          size={20}
-          color={theme.colors.secondary.main}
-        />
-        <View style={styles.foundAddressText}>
-          {item.line_2 && (
-            <Text style={styles.foundAddressLine}>{item.line_2}</Text>
-          )}
-          <Text style={styles.foundAddressLocation}>
-            {item.post_town}, {item.postcode}
-          </Text>
+  const renderFoundAddressItem = ({ item, index }) => {
+    // Construct the full address string for display
+    const addressParts = [
+      item.line_1,
+      item.line_2,
+      item.line_3,
+      item.post_town,
+      item.postcode,
+    ].filter(Boolean); // Remove empty values
+
+    return (
+      <TouchableOpacity
+        style={styles.foundAddressItem}
+        onPress={() => handleSelectFoundAddress(item)}
+      >
+        <View style={styles.foundAddressContent}>
+          <Ionicons
+            name="location-outline"
+            size={20}
+            color={theme.colors.secondary.main}
+            style={{ marginTop: 2 }}
+          />
+          <View style={styles.foundAddressText}>
+            <Text style={styles.foundAddressLine}>
+              {addressParts.join(", ")}
+            </Text>
+          </View>
         </View>
-      </View>
-      <Ionicons
-        name="chevron-forward"
-        size={20}
-        color={theme.colors.text.tertiary}
-      />
-    </TouchableOpacity>
-  );
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={theme.colors.text.tertiary}
+        />
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
     return (
