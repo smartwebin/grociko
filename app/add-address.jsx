@@ -212,14 +212,9 @@ const AddAddress = () => {
 
   const handleSave = async () => {
     // Validation
-    if (
-      !formData.line_1 ||
-      !formData.city ||
-      !formData.pincode ||
-      !formData.landmark
-    ) {
+    if (!formData.line_1 || !formData.city || !formData.pincode) {
       showToast(
-        "Please fill all required fields (Address Line 1, City, Postcode, Landmark)",
+        "Please fill all required fields (Address Line 1, City, Postcode)",
         "error",
       );
       return;
@@ -502,9 +497,7 @@ const AddAddress = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>
-                Landmark <Text style={styles.required}>*</Text>
-              </Text>
+              <Text style={styles.inputLabel}>Landmark</Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.landmark}
