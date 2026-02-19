@@ -137,7 +137,7 @@ export default function ProductDetail() {
       <Image
         source={{ uri: item }}
         style={styles.productImage}
-        resizeMode="cover"
+        resizeMode="contain"
       />
     </View>
   );
@@ -188,7 +188,7 @@ export default function ProductDetail() {
       ? Math.round(
           ((parseFloat(product.mrp) - parseFloat(product.sale_price)) /
             parseFloat(product.mrp)) *
-            100
+            100,
         )
       : 0;
 
@@ -292,7 +292,6 @@ export default function ProductDetail() {
                   <Text style={styles.tagText}>{product.category}</Text>
                 </View>
               )}
-              
             </View>
           </View>
 
@@ -389,57 +388,64 @@ export default function ProductDetail() {
               </View>
             )}
             {product.feature_title1 && product.feature_description1 && (
-  <View style={styles.specRow}>
-    <Text style={styles.specLabel}>{product.feature_title1}</Text>
-    <Text style={styles.specValue}>{product.feature_description1}</Text>
-  </View>
-)}
+              <View style={styles.specRow}>
+                <Text style={styles.specLabel}>{product.feature_title1}</Text>
+                <Text style={styles.specValue}>
+                  {product.feature_description1}
+                </Text>
+              </View>
+            )}
 
-{product.feature_title2 && product.feature_description2 && (
-  <View style={styles.specRow}>
-    <Text style={styles.specLabel}>{product.feature_title2}</Text>
-    <Text style={styles.specValue}>{product.feature_description2}</Text>
-  </View>
-)}
+            {product.feature_title2 && product.feature_description2 && (
+              <View style={styles.specRow}>
+                <Text style={styles.specLabel}>{product.feature_title2}</Text>
+                <Text style={styles.specValue}>
+                  {product.feature_description2}
+                </Text>
+              </View>
+            )}
 
-{product.feature_title3 && product.feature_description3 && (
-  <View style={styles.specRow}>
-    <Text style={styles.specLabel}>{product.feature_title3}</Text>
-    <Text style={styles.specValue}>{product.feature_description3}</Text>
-  </View>
-)}
+            {product.feature_title3 && product.feature_description3 && (
+              <View style={styles.specRow}>
+                <Text style={styles.specLabel}>{product.feature_title3}</Text>
+                <Text style={styles.specValue}>
+                  {product.feature_description3}
+                </Text>
+              </View>
+            )}
 
-{product.feature_title4 && product.feature_description4 && (
-  <View style={styles.specRow}>
-    <Text style={styles.specLabel}>{product.feature_title4}</Text>
-    <Text style={styles.specValue}>{product.feature_description4}</Text>
-  </View>
-)}
+            {product.feature_title4 && product.feature_description4 && (
+              <View style={styles.specRow}>
+                <Text style={styles.specLabel}>{product.feature_title4}</Text>
+                <Text style={styles.specValue}>
+                  {product.feature_description4}
+                </Text>
+              </View>
+            )}
 
-{product.feature_title5 && product.feature_description5 && (
-  <View style={styles.specRow}>
-    <Text style={styles.specLabel}>{product.feature_title5}</Text>
-    <Text style={styles.specValue}>{product.feature_description5}</Text>
-  </View>
-)}
-
+            {product.feature_title5 && product.feature_description5 && (
+              <View style={styles.specRow}>
+                <Text style={styles.specLabel}>{product.feature_title5}</Text>
+                <Text style={styles.specValue}>
+                  {product.feature_description5}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
         {/* Product Detail Section */}
-{product.description && (
-  <View style={styles.section}>
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>Product Detail</Text>
-    </View>
+        {product.description && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Product Detail</Text>
+            </View>
 
-    <View style={styles.sectionContent}>
-      <Text style={styles.description}>{product.description}</Text>
-    </View>
-  </View>
-)}
+            <View style={styles.sectionContent}>
+              <Text style={styles.description}>{product.description}</Text>
+            </View>
+          </View>
+        )}
 
-
-        
         {product.quantity <= 10 && (
           <Text style={styles.stockWarning}>
             Only {product.quantity} left in stock

@@ -462,7 +462,7 @@ const Orders = () => {
                                   : item.image
                               }
                               style={styles.modalItemImage}
-                              resizeMode="cover"
+                              resizeMode="contain"
                             />
                             <View style={styles.modalItemDetails}>
                               <Text style={styles.modalItemName}>

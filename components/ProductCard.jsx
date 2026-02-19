@@ -11,7 +11,7 @@ const ProductCard = ({ item, onPress }) => {
   const handleAddToCart = () => {
     const cartProduct = {
       ...item,
-      unit:item.weight ? item.weight : item.unit,
+      unit: item.weight ? item.weight : item.unit,
       availableStock: item.quantity,
     };
     // console.log("cartProduct",cartProduct)
@@ -66,7 +66,7 @@ const ProductCard = ({ item, onPress }) => {
               styles.productImage,
               isOutOfStock && styles.outOfStockImage,
             ]}
-            resizeMode="cover"
+            resizeMode="contain"
           />
           {item.tag && (
             <View
@@ -78,10 +78,19 @@ const ProductCard = ({ item, onPress }) => {
                 },
               ]}
             >
-              <Text style={[styles.offerText,{
-                    color: item.tag_color =="yellow" ? "black": theme.colors.text.white,
-
-              }]}>{item.tag}</Text>
+              <Text
+                style={[
+                  styles.offerText,
+                  {
+                    color:
+                      item.tag_color == "yellow"
+                        ? "black"
+                        : theme.colors.text.white,
+                  },
+                ]}
+              >
+                {item.tag}
+              </Text>
             </View>
           )}
 
@@ -195,12 +204,12 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "100%",
-    height: 110,
+    height: 140,
     backgroundColor: theme.colors.surface.light,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.xs,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
     position: "relative",
   },
   productImage: {
