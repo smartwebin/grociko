@@ -78,6 +78,8 @@ export default function ProductDetail() {
       sellingPrice: parseFloat(product.sale_price),
       image: product.image,
       availableStock: product.quantity,
+      includes_tax: product.includes_tax || "no",
+      tax: parseFloat(product.tax) || 0,
     };
     addToCart(cartProduct, 1);
   };
@@ -351,6 +353,11 @@ export default function ProductDetail() {
               <Text style={styles.price}>
                 £{parseFloat(product.sale_price).toFixed(2)}
               </Text>
+              {product.vat_cat === "B" && (
+                <Text style={styles.taxInclusiveText}>
+                  (Inclusive of all taxes)
+                </Text>
+              )}
             </View>
           </View>
         </View>
@@ -700,6 +707,12 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     textDecorationLine: "line-through",
     marginBottom: theme.spacing.xs / 2,
+  },
+  taxInclusiveText: {
+    fontSize: 10,
+    fontFamily: "Outfit-Regular",
+    color: theme.colors.text.secondary,
+    marginTop: 2,
   },
 
   // Section Styles

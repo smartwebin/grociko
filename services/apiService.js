@@ -829,6 +829,8 @@ export const createUserAddress = async (addressData) => {
     formData.append("city", addressData.city || "");
     formData.append("pincode", addressData.pincode || "");
     formData.append("landmark", addressData.landmark || "");
+    formData.append("latitude", addressData.latitude || "");
+    formData.append("longitude", addressData.longitude || "");
 
     const headers = {
       Authorization: getBasicAuthHeader(),
@@ -878,6 +880,8 @@ export const updateUserAddress = async (addressData) => {
     formData.append("city", addressData.city || "");
     formData.append("pincode", addressData.pincode || "");
     formData.append("landmark", addressData.landmark || "");
+    formData.append("latitude", addressData.latitude || "");
+    formData.append("longitude", addressData.longitude || "");
 
     const headers = {
       Authorization: getBasicAuthHeader(),
@@ -989,7 +993,7 @@ export const getFilters = async () => {
 /**
  * Get Delivery Charge based on address
  */
-export const getDeliveryCharge = async (addressId) => {
+export const getDeliveryCharge = async (addressId, totalAmount = 0) => {
   try {
     const headers = {
       Authorization: getBasicAuthHeader(),
@@ -999,7 +1003,7 @@ export const getDeliveryCharge = async (addressId) => {
     console.log("🚚 Fetching delivery charge for address:", addressId);
 
     const response = await makeRequest(
-      `/get-delivery-charge.php?address_id=${addressId}`,
+      `/get-delivery-charge.php?address_id=${addressId}&total=${totalAmount}`,
       {
         method: "GET",
         headers,

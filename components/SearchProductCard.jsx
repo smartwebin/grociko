@@ -3,7 +3,7 @@ import theme from '@/utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const SearchProductCard = ({ item, onPress }) => {
+const SearchProductCard = ({ item, onPress, cardWidth }) => {
   const { addToCart, updateQuantity, getItemQuantity } = useCart();
   const quantity = getItemQuantity(item.id);
 
@@ -43,7 +43,7 @@ const SearchProductCard = ({ item, onPress }) => {
 
   return (
     <TouchableOpacity 
-      style={styles.card} 
+      style={[styles.card, cardWidth ? { width: cardWidth } : { flex: 1 }]} 
       onPress={() => onPress(item)}
       activeOpacity={0.7}
     >
@@ -86,6 +86,13 @@ const SearchProductCard = ({ item, onPress }) => {
           )}
           <Text style={styles.price}>£{item.sellingPrice.toFixed(2)}</Text>
         </View>
+
+        {/* Tax Inclusive text */}
+        {item.includes_tax === "yes" && parseFloat(item.tax) > 0 && (
+          <Text style={styles.taxInclusiveText}>
+            (Inclusive of all taxes)
+          </Text>
+        )}
 
         {/* Add to Cart Button or Quantity Selector */}
         <View style={styles.actionContainer}>
@@ -196,6 +203,13 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     fontFamily: 'Outfit-Bold',
     color: theme.colors.text.primary,
+  },
+  taxInclusiveText: {
+    fontSize: 9,
+    fontFamily: "Outfit-Regular",
+    color: theme.colors.text.secondary,
+    marginTop: -4,
+    marginBottom: 4,
   },
   actionContainer: {
     alignItems: 'flex-end',

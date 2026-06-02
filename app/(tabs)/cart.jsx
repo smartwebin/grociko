@@ -3,6 +3,7 @@ import { useCart } from "@/providers/CartProvider";
 import theme from "@/utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import React from "react";
 import {
   Alert,
   FlatList,
@@ -11,6 +12,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
 } from "react-native";
 
 const Cart = () => {
@@ -19,23 +21,28 @@ const Cart = () => {
 
   const { formattedPrice, totalItems } = getCartSummary();
 
-  // Calculate VAT based on product vat_cat
-  const calculateVATAmount = () => {
-    let vatAmount = 0;
-    items.forEach((item) => {
-      const itemPrice =
-        parseFloat(item.sellingPrice || item.price || 0) * item.quantity;
-      // Only apply VAT if vat_cat is 'B'
-      if (item.vat_cat === "B") {
-        vatAmount += itemPrice * 0.2; // 20% VAT
-      }
-    });
-    return vatAmount;
-  };
+  const [showAgeModal, setShowAgeModal] = React.useState(false);
+  const [ageAcknowledged, setAgeAcknowledged] = React.useState(false);
 
-  const vatAmount = calculateVATAmount();
+  // Age restriction logic
+  const ageRestrictedItems = items.filter(
+    (item) => item.age_verification_req === "yes"
+  );
+
+  const highestAge = ageRestrictedItems.reduce((max, item) => {
+    const age = parseInt(item.age) || 0;
+    return age > max ? age : max;
+  }, 0);
+
+  // Reset acknowledgment if no age restricted items
+  React.useEffect(() => {
+    if (ageRestrictedItems.length === 0 && ageAcknowledged) {
+      setAgeAcknowledged(false);
+    }
+  }, [ageRestrictedItems.length]);
+
   const subtotal = parseFloat(formattedPrice.replace(/[£$,]/g, "")) || 0;
-  const totalWithVAT = subtotal + vatAmount;
+  const total = subtotal;
 
   const handleRemoveItem = (itemId) => {
     removeFromCart(itemId);
@@ -67,17 +74,16 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
+    if (ageRestrictedItems.length > 0 && !ageAcknowledged) {
+      setShowAgeModal(true);
+      return;
+    }
     router.push("/checkout");
   };
 
   const renderCartItem = ({ item }) => {
-    // Calculate VAT if applicable
-    const vatRate = item.vat_cat === "B" ? 0.2 : 0;
-    const itemBasePrice =
-      (item.sellingPrice || item.price || 0) * item.quantity;
-    const itemVatAmount = itemBasePrice * vatRate;
-    const itemTotalPrice = itemBasePrice + itemVatAmount;
-// {console.log("item",item)}
+    const itemTotalPrice = (item.sellingPrice || item.price || 0) * item.quantity;
+    // {console.log("item",item)}
     return (
       <View style={styles.cartItem}>
         <Image
@@ -126,8 +132,8 @@ const Cart = () => {
                 style={[
                   styles.quantityButton,
                   item.availableStock &&
-                    item.quantity >= item.availableStock &&
-                    styles.quantityButtonDisabled,
+                  item.quantity >= item.availableStock &&
+                  styles.quantityButtonDisabled,
                 ]}
                 onPress={() => handleIncrement(item)}
                 disabled={
@@ -148,9 +154,9 @@ const Cart = () => {
 
             <View style={styles.priceContainer}>
               <Text style={styles.itemPrice}>£{itemTotalPrice.toFixed(2)}</Text>
-              {item.vat_cat === "B" && (
+              {item.includes_tax === "yes" && parseFloat(item.tax) > 0 && (
                 <Text style={styles.vatDetails}>
-                  incl. VAT £{itemVatAmount.toFixed(2)}
+                  (Inclusive of all taxes)
                 </Text>
               )}
               {item.availableStock && item.quantity >= item.availableStock && (
@@ -220,19 +226,10 @@ const Cart = () => {
                   </Text>
                 </View>
 
-                {vatAmount > 0 && (
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>VAT (20%)</Text>
-                    <Text style={styles.summaryValue}>
-                      £{vatAmount.toFixed(2)}
-                    </Text>
-                  </View>
-                )}
-
                 <View style={[styles.summaryRow, styles.totalRow]}>
                   <Text style={styles.totalLabel}>Total</Text>
                   <Text style={styles.totalValue}>
-                    £{totalWithVAT.toFixed(2)}
+                    £{total.toFixed(2)}
                   </Text>
                 </View>
               </View>
@@ -245,7 +242,7 @@ const Cart = () => {
                 >
                   <Text style={styles.checkoutButtonText}>Go to Checkout</Text>
                   <Text style={styles.checkoutPrice}>
-                    £{totalWithVAT.toFixed(2)}
+                    £{total.toFixed(2)}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -255,6 +252,63 @@ const Cart = () => {
 
         {/* Cart Summary */}
       </View>
+
+      {/* Age Restriction Modal */}
+      <Modal
+        visible={showAgeModal}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.ageModalContainer}>
+            <View style={styles.ageModalHeader}>
+              <Ionicons name="warning" size={24} color="#f44336" />
+              <Text style={styles.ageModalTitle}>Age Restriction Warning</Text>
+            </View>
+            <Text style={styles.ageModalText}>
+              Your cart contains age-restricted items. You must meet the required age to purchase these products:
+            </Text>
+
+            <View style={styles.ageItemsList}>
+              {ageRestrictedItems.map((item) => (
+                <View key={item.id} style={styles.ageItemRow}>
+                  <Text style={styles.ageItemName} numberOfLines={1}>{item.name}</Text>
+                  <View style={styles.ageBadge}>
+                    <Text style={styles.ageBadgeText}>{item.age}+</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.ageConfirmText}>
+              By proceeding, you confirm that you are at least {highestAge} years old.
+            </Text>
+
+            <View style={styles.ageModalActions}>
+              <TouchableOpacity
+                style={styles.ageRemoveButton}
+                onPress={() => {
+                  ageRestrictedItems.forEach(item => removeFromCart(item.id));
+                  setShowAgeModal(false);
+                }}
+              >
+                <Text style={styles.ageRemoveText}>Remove Items</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.ageAckButton}
+                onPress={() => {
+                  setAgeAcknowledged(true);
+                  setShowAgeModal(false);
+                  router.push("/checkout");
+                }}
+              >
+                <Text style={styles.ageAckText}>I Acknowledge</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaWrapper>
   );
 };
@@ -477,6 +531,104 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.lg,
     fontFamily: "Outfit-SemiBold",
     color: theme.colors.text.white,
+  },
+  // Age Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+  },
+  ageModalContainer: {
+    backgroundColor: theme.colors.background.primary,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.xl,
+    width: '100%',
+    maxWidth: 400,
+  },
+  ageModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  ageModalTitle: {
+    fontSize: theme.typography.fontSize.xl,
+    fontFamily: 'Outfit-Bold',
+    color: '#f44336',
+  },
+  ageModalText: {
+    fontSize: theme.typography.fontSize.base,
+    fontFamily: 'Outfit-Regular',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
+  },
+  ageItemsList: {
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
+  ageItemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.xs,
+  },
+  ageItemName: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: 'Outfit-Medium',
+    color: theme.colors.text.primary,
+    marginRight: theme.spacing.sm,
+  },
+  ageBadge: {
+    backgroundColor: '#f44336',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  ageBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontFamily: 'Outfit-Bold',
+  },
+  ageConfirmText: {
+    fontSize: theme.typography.fontSize.base,
+    fontFamily: 'Outfit-SemiBold',
+    color: '#f44336',
+    marginBottom: theme.spacing.xl,
+  },
+  ageModalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: theme.spacing.md,
+  },
+  ageRemoveButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.surface.border,
+    alignItems: 'center',
+  },
+  ageRemoveText: {
+    color: theme.colors.text.secondary,
+    fontFamily: 'Outfit-Medium',
+    fontSize: theme.typography.fontSize.base,
+  },
+  ageAckButton: {
+    flex: 1,
+    backgroundColor: '#f44336',
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+  },
+  ageAckText: {
+    color: 'white',
+    fontFamily: 'Outfit-SemiBold',
+    fontSize: theme.typography.fontSize.base,
   },
 });
 

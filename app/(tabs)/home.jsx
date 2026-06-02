@@ -41,7 +41,7 @@ const Home = () => {
       fetchHomeData();
 
       // Optional cleanup (runs when leaving screen)
-      return () => {};
+      return () => { };
     }, [])
   );
 
@@ -113,10 +113,12 @@ const Home = () => {
                 `${product.weight || "1kg"}, Price per ${product.unit || "kg"}`,
               mrp: parseFloat(product.mrp) || 0,
               sellingPrice: parseFloat(product.sale_price) || 0,
-              image: product.image
-                ? { uri: product.image }
-                : require("../../assets/images/products/large/01.png"),
+              image: { uri: product.image },
               category: product.category?.toLowerCase() || "general",
+              includes_tax: product.includes_tax || "no",
+              tax: parseFloat(product.tax) || 0,
+              age_verification_req: product.age_verification_req || "no",
+              age: parseInt(product.age) || 0,
             })),
           }));
         setCategories(mappedCategories);
@@ -153,10 +155,12 @@ const Home = () => {
             `${product.weight || "1kg"}, Price per ${product.unit || "kg"}`,
           mrp: parseFloat(product.mrp) || 0,
           sellingPrice: parseFloat(product.sale_price) || 0,
-          image: product.image
-            ? { uri: product.image }
-            : require("../../assets/images/products/large/01.png"),
+          image: { uri: product.image },
           category: product.category?.toLowerCase() || "general",
+          includes_tax: product.includes_tax || "no",
+          tax: parseFloat(product.tax) || 0,
+          age_verification_req: product.age_verification_req || "no",
+          age: parseInt(product.age) || 0,
         }));
 
         // Best selling - first 6 products (excluding featured)

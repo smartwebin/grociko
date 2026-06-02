@@ -56,6 +56,8 @@ const AddAddress = () => {
     ward: "",
     dependant_locality: "",
     landmark: "",
+    latitude: "",
+    longitude: "",
   });
 
   useFocusEffect(
@@ -115,6 +117,8 @@ const AddAddress = () => {
               district: address.district || "",
               ward: address.ward || "",
               landmark: address.landmark || "",
+              latitude: address.latitude || "",
+              longitude: address.longitude || "",
             });
           } else {
             showToast("Address not found", "error");
@@ -205,6 +209,8 @@ const AddAddress = () => {
       district: address.district || "",
       ward: address.ward || "",
       landmark: formData.landmark || "",
+      latitude: formData.latitude || "",
+      longitude: formData.longitude || "",
     });
 
     setAddressListModalVisible(false);
@@ -212,9 +218,9 @@ const AddAddress = () => {
 
   const handleSave = async () => {
     // Validation
-    if (!formData.line_1 || !formData.city || !formData.pincode) {
+    if (!formData.city || !formData.pincode) {
       showToast(
-        "Please fill all required fields (Address Line 1, City, Postcode)",
+        "Please fill all required fields (City, Postcode)",
         "error",
       );
       return;
@@ -239,6 +245,8 @@ const AddAddress = () => {
         address1: formData.line_1,
         address2: formData.line_2,
         address3: formData.line_3,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
       };
 
       let response;
@@ -413,7 +421,7 @@ const AddAddress = () => {
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>
-                Address Line 1 <Text style={styles.required}>*</Text>
+                Address Line 1
               </Text>
               <TextInput
                 style={styles.textInput}
@@ -429,7 +437,7 @@ const AddAddress = () => {
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>
-                Address Line 2 <Text style={styles.required}>*</Text>
+                Address Line 2
               </Text>
               <TextInput
                 style={styles.textInput}
@@ -445,7 +453,7 @@ const AddAddress = () => {
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>
-                Address Line 3 <Text style={styles.required}>*</Text>
+                Address Line 3
               </Text>
               <TextInput
                 style={styles.textInput}
@@ -506,6 +514,36 @@ const AddAddress = () => {
                 }
                 placeholder="Nearby landmark"
                 placeholderTextColor={theme.colors.text.placeholder}
+                editable={!saving}
+              />
+            </View>
+            
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Latitude</Text>
+              <TextInput
+                style={styles.textInput}
+                value={formData.latitude}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, latitude: text })
+                }
+                placeholder="e.g. 51.5074"
+                placeholderTextColor={theme.colors.text.placeholder}
+                keyboardType="numeric"
+                editable={!saving}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Longitude</Text>
+              <TextInput
+                style={styles.textInput}
+                value={formData.longitude}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, longitude: text })
+                }
+                placeholder="e.g. -0.1278"
+                placeholderTextColor={theme.colors.text.placeholder}
+                keyboardType="numeric"
                 editable={!saving}
               />
             </View>

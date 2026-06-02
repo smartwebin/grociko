@@ -41,7 +41,7 @@ const cartReducer = (state, action) => {
 
     case CART_ACTIONS.ADD_ITEM:
       const existingItemIndex = state.items.findIndex(
-        item => item.id === action.payload.id
+        item => String(item.id) === String(action.payload.id)
       );
 
       let updatedItems;
@@ -73,7 +73,7 @@ const cartReducer = (state, action) => {
 
     case CART_ACTIONS.REMOVE_ITEM:
       const filteredItems = state.items.filter(
-        item => item.id !== action.payload.id
+        item => String(item.id) !== String(action.payload.id)
       );
 
       return {
@@ -85,7 +85,7 @@ const cartReducer = (state, action) => {
 
     case CART_ACTIONS.UPDATE_QUANTITY:
       const quantityUpdatedItems = state.items.map(item =>
-        item.id === action.payload.id
+        String(item.id) === String(action.payload.id)
           ? { ...item, quantity: Math.max(0, action.payload.quantity) }
           : item
       ).filter(item => item.quantity > 0); // Remove items with 0 quantity
@@ -106,9 +106,9 @@ const cartReducer = (state, action) => {
       };
 
     case CART_ACTIONS.TOGGLE_FAVORITE:
-      const isFavorite = state.favorites.some(fav => fav.id === action.payload.id);
+      const isFavorite = state.favorites.some(fav => String(fav.id) === String(action.payload.id));
       const updatedFavorites = isFavorite
-        ? state.favorites.filter(fav => fav.id !== action.payload.id)
+        ? state.favorites.filter(fav => String(fav.id) !== String(action.payload.id))
         : [...state.favorites, { ...action.payload, addedAt: new Date().toISOString() }];
 
       return {
@@ -245,16 +245,16 @@ export const CartProvider = ({ children }) => {
 
   // Utility Functions
   const getItemQuantity = (itemId) => {
-    const item = state.items.find(item => item.id === itemId);
+    const item = state.items.find(item => String(item.id) === String(itemId));
     return item ? item.quantity : 0;
   };
 
   const isItemInCart = (itemId) => {
-    return state.items.some(item => item.id === itemId);
+    return state.items.some(item => String(item.id) === String(itemId));
   };
 
   const isItemFavorite = (itemId) => {
-    return state.favorites.some(fav => fav.id === itemId);
+    return state.favorites.some(fav => String(fav.id) === String(itemId));
   };
 
   const getCartSummary = () => {

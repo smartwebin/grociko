@@ -13,6 +13,8 @@ const ProductCard = ({ item, onPress }) => {
       ...item,
       unit: item.weight ? item.weight : item.unit,
       availableStock: item.quantity,
+      includes_tax: item.includes_tax,
+      tax: item.tax,
     };
     // console.log("cartProduct",cartProduct)
     addToCart(cartProduct, 1);
@@ -116,6 +118,13 @@ const ProductCard = ({ item, onPress }) => {
                 £{item.sellingPrice.toFixed(2)}
               </Text>
             </View>
+
+            {/* Tax Inclusive text */}
+            {item.includes_tax === "yes" && parseFloat(item.tax) > 0 && (
+              <Text style={styles.taxInclusiveText}>
+                (Inclusive of all taxes)
+              </Text>
+            )}
 
             {/* Stock availability indicator */}
             {!isOutOfStock && (
@@ -259,6 +268,13 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     fontFamily: "Outfit-SemiBold",
     color: theme.colors.text.primary,
+  },
+  taxInclusiveText: {
+    fontSize: 9,
+    fontFamily: "Outfit-Regular",
+    color: theme.colors.text.secondary,
+    marginTop: -2,
+    marginBottom: 4,
   },
   stockIndicator: {
     marginTop: 2,

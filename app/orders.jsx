@@ -17,6 +17,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Linking,
 } from "react-native";
 
 const Orders = () => {
@@ -447,6 +448,27 @@ const Orders = () => {
                             {selectedOrder.deliveryTime}
                           </Text>
                         )}
+                        
+                      {/* Tracking Information */}
+                      {(selectedOrder.tracking_number || selectedOrder.tracking_link) && (
+                        <View style={styles.trackingSection}>
+                          <Text style={styles.trackingTitle}>Tracking Information</Text>
+                          {selectedOrder.tracking_number && (
+                            <View style={styles.trackingRow}>
+                              <Text style={styles.trackingLabel}>Tracking No.:</Text>
+                              <Text style={styles.trackingValue}>{selectedOrder.tracking_number}</Text>
+                            </View>
+                          )}
+                          {selectedOrder.tracking_link && (
+                            <View style={styles.trackingRow}>
+                              <Text style={styles.trackingLabel}>Tracking Link:</Text>
+                              <TouchableOpacity onPress={() => Linking.openURL(selectedOrder.tracking_link)}>
+                                <Text style={styles.trackingLink}>Track Order</Text>
+                              </TouchableOpacity>
+                            </View>
+                          )}
+                        </View>
+                      )}
                     </View>
 
                     {/* Items List */}
@@ -473,19 +495,22 @@ const Orders = () => {
                               </Text>
                               <View style={styles.modalItemPriceBreakdown}>
                                 <Text style={styles.modalItemBreakdownText}>
-                                  Price: £
+                                  Unit Price (Ex. VAT): £
                                   {parseFloat(item.price || 0).toFixed(2)}
                                 </Text>
-                                {item.vat && parseFloat(item.vat) > 0 && (
+                                <Text style={styles.modalItemBreakdownText}>
+                                  Subtotal (Ex. VAT): £
+                                  {parseFloat(item.total_price || 0).toFixed(2)}
+                                </Text>
+                                {parseFloat(item.vat || 0) > 0 && (
                                   <Text style={styles.modalItemBreakdownText}>
-                                    VAT: £{parseFloat(item.vat).toFixed(2)}
+                                    VAT ({parseFloat(item.tax_percentage || 0)}%): £
+                                    {parseFloat(item.vat || 0).toFixed(2)}
                                   </Text>
                                 )}
                                 <Text style={styles.modalItemBreakdownTotal}>
-                                  Total: £
-                                  {parseFloat(
-                                    item.total_price || item.price || 0,
-                                  ).toFixed(2)}
+                                  Total (Inc. VAT): £
+                                  {(parseFloat(item.total_price || 0) + parseFloat(item.vat || 0)).toFixed(2)}
                                 </Text>
                               </View>
                             </View>
@@ -515,12 +540,19 @@ const Orders = () => {
                             )}
                           </Text>
                         </View>
-                        <View style={styles.billingRow}>
-                          <Text style={styles.billingLabel}>VAT (20%)</Text>
-                          <Text style={styles.billingValue}>
-                            £{parseFloat(selectedOrder.vat || 0).toFixed(2)}
-                          </Text>
-                        </View>
+                        {selectedOrder.deliveryZone && (
+                          <View style={styles.billingRow}>
+                            <Text style={styles.billingLabel}>
+                              Delivery Zone
+                            </Text>
+                            <Text style={styles.billingValue}>
+                              {selectedOrder.deliveryZone}
+                              {selectedOrder.userKm && parseFloat(selectedOrder.userKm) > 0
+                                ? ` (${(Math.floor(parseFloat(selectedOrder.userKm) * 100) / 100).toFixed(2)}km)`
+                                : ""}
+                            </Text>
+                          </View>
+                        )}
                         <View style={styles.billingRow}>
                           <Text
                             style={{
@@ -990,6 +1022,42 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.lg,
     fontFamily: "Outfit-SemiBold",
     color: theme.colors.primary.main,
+  },
+  trackingSection: {
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.surface.border,
+  },
+  trackingTitle: {
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: "Outfit-Medium",
+    color: theme.colors.primary.main,
+    marginBottom: theme.spacing.xs,
+  },
+  trackingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  trackingLabel: {
+    width: 100,
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: "Outfit-Medium",
+    color: theme.colors.text.secondary,
+  },
+  trackingValue: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: "Outfit-Regular",
+    color: theme.colors.text.primary,
+  },
+  trackingLink: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: "Outfit-Regular",
+    color: theme.colors.primary.main,
+    textDecorationLine: "underline",
   },
   modalActions: {
     paddingHorizontal: theme.spacing.lg,

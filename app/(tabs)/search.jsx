@@ -1,4 +1,4 @@
-import ProductCard from "@/components/ProductCard";
+import SearchProductCard from "@/components/SearchProductCard";
 import SafeAreaWrapper from "@/components/SafeAreaWrapper";
 import SafeAreaWrapper2 from "@/components/SafeAreaWrapper2";
 import { getFilters, getProducts } from "@/services/apiService";
@@ -17,9 +17,14 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 const Search = () => {
+  const { width } = useWindowDimensions();
+  // Calculate item width: (screen width - horizontal padding (16*2) - gap between items (15)) / 2
+  const itemWidth = (width - 32 - 15) / 2;
+
   const searchParams = useLocalSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -176,6 +181,10 @@ const Search = () => {
             brand: prod.brand || "",
             featured: prod.featured === "yes",
             status: prod.status || "",
+            includes_tax: prod.includes_tax || "no",
+            tax: parseFloat(prod.tax) || 0,
+            age_verification_req: prod.age_verification_req || "no",
+            age: parseInt(prod.age) || 0,
           }));
 
           // Either append to existing products or replace them
@@ -386,7 +395,7 @@ const Search = () => {
   );
 
   const renderProductItem = ({ item }) => (
-    <ProductCard item={item} onPress={handleProductPress} />
+    <SearchProductCard item={item} onPress={handleProductPress} cardWidth={itemWidth} />
   );
 
   if (loading) {
@@ -536,7 +545,7 @@ const Search = () => {
                 />
               }
               contentContainerStyle={styles.productsList}
-              columnWrapperStyle={styles.row}
+              columnWrapperStyle={{ gap: 15 }}
               onEndReached={handleLoadMore}
               onEndReachedThreshold={0.5} // Load when 50% from bottom
               ListFooterComponent={() =>

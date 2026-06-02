@@ -46,6 +46,8 @@ const Checkout = () => {
   const [promoCodes, setPromoCodes] = useState([]);
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [deliveryZone, setDeliveryZone] = useState("");
+  const [userKm, setUserKm] = useState(0);
+  const [minFreeDeliveryAmount, setMinFreeDeliveryAmount] = useState(0);
   const [isServiceable, setIsServiceable] = useState(true);
   const [serviceabilityMessage, setServiceabilityMessage] = useState("");
 
@@ -59,16 +61,9 @@ const Checkout = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
-  // Calculate VAT based on product vat_cat
   const calculateVATAmount = () => {
     let vatAmount = 0;
-    items.forEach((item) => {
-      const itemPrice = parseFloat(item.sellingPrice) * item.quantity;
-      // Only apply VAT if vat_cat is 'B'
-      if (item.vat_cat === "B") {
-        vatAmount += itemPrice * 0.2; // 20% VAT
-      }
-    });
+    // VAT is already hidden or handled separately, just returning 0 so we remove unwanted VAT.
     return vatAmount;
   };
 
@@ -81,7 +76,8 @@ const Checkout = () => {
     : 0;
   const discountedSubtotal = subtotal - promoDiscount;
   const vatAmount = calculateVATAmount();
-  const totalAmount = discountedSubtotal + deliveryFee + vatAmount;
+  // Total no longer adds VAT, because the subtotal is already tax-inclusive
+  const totalAmount = discountedSubtotal + deliveryFee;
 
   const paymentMethods = [
     {
@@ -143,7 +139,7 @@ const Checkout = () => {
         setSelectedAddress(selectedAddr);
 
         // Get delivery charge for selected address
-        await loadDeliveryCharge(selectedAddr.id);
+        await loadDeliveryCharge(selectedAddr.id, discountedSubtotal);
       } else {
         // No addresses found, prompt to add one
         Alert.alert(
@@ -176,14 +172,16 @@ const Checkout = () => {
     }
   };
 
-  const loadDeliveryCharge = async (addressId) => {
+  const loadDeliveryCharge = async (addressId, total) => {
     try {
-      const response = await getDeliveryCharge(addressId);
+      const response = await getDeliveryCharge(addressId, total || discountedSubtotal);
 
       if (response.success && response.data) {
         const chargeData = response.data[0] || response.data;
         setDeliveryFee(parseFloat(chargeData.delivery_charge) || 0);
         setDeliveryZone(chargeData.delivery_zone || "");
+        setUserKm(parseFloat(chargeData.user_km) || 0);
+        setMinFreeDeliveryAmount(parseFloat(chargeData.min_free_delivery_amount) || 0);
         setIsServiceable(true);
         setServiceabilityMessage("");
       } else {
@@ -393,7 +391,7 @@ const Checkout = () => {
   const handleSelectAddress = async (address) => {
     setSelectedAddress(address);
     setShowAddressModal(false);
-    await loadDeliveryCharge(address.id);
+    await loadDeliveryCharge(address.id, discountedSubtotal);
   };
 
   // Handle Card Payment with Stripe Payment Sheet
@@ -707,11 +705,10 @@ const Checkout = () => {
             </View>
 
             {items.map((item, index) => {
-              // Calculate VAT if applicable
-              const vatRate = item.vat_cat === "B" ? 0.2 : 0;
-              const itemVatAmount = item.sellingPrice * vatRate * item.quantity;
-              const itemSubtotal = item.sellingPrice * item.quantity;
-              const itemTotal = itemSubtotal + itemVatAmount;
+              // Calculate VAT if applicable (Extract from inclusive price)
+              const taxRate = (item.includes_tax === "yes" && item.tax > 0) ? item.tax : 0;
+              const itemTotal = item.sellingPrice * item.quantity; // selling price is inclusive
+              const itemVatAmount = (itemTotal * taxRate) / (100 + taxRate);
 
               return (
                 <View key={item.id} style={styles.orderItem}>
@@ -729,9 +726,9 @@ const Checkout = () => {
                     <Text style={styles.orderItemDetails}>
                       {item.quantity} x £{item.sellingPrice.toFixed(2)}
                     </Text>
-                    {item.vat_cat === "B" && (
+                    {item.includes_tax === "yes" && item.tax > 0 && (
                       <Text style={styles.vatDetails}>
-                        VAT: £{itemVatAmount.toFixed(2)}
+                        Includes VAT: £{itemVatAmount.toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -950,12 +947,30 @@ const Checkout = () => {
             )}
           </View>
 
+          {/* Free Delivery Info Banner */}
+          {minFreeDeliveryAmount > 0 && discountedSubtotal < minFreeDeliveryAmount && (
+            <View style={[styles.section, { paddingBottom: 0, borderBottomWidth: 0 }]}>
+              <View style={{
+                backgroundColor: theme.colors.status.info + "15",
+                padding: theme.spacing.md,
+                borderRadius: theme.borderRadius.md,
+                flexDirection: "row",
+                alignItems: "center"
+              }}>
+                <Ionicons name="information-circle" size={24} color={theme.colors.status.info} style={{ marginRight: theme.spacing.sm }} />
+                <Text style={{ flex: 1, fontSize: theme.typography.fontSize.sm, color: theme.colors.text.primary, fontFamily: "Outfit-Medium" }}>
+                  Add £{(minFreeDeliveryAmount - discountedSubtotal).toFixed(2)} more to your order to get Free Delivery!
+                </Text>
+              </View>
+            </View>
+          )}
+
           {/* Order Summary */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Order Summary</Text>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Subtotal</Text>
+              <Text style={styles.summaryLabel}>Subtotal (Inc. VAT)</Text>
               <Text style={styles.summaryValue}>£{subtotal.toFixed(2)}</Text>
             </View>
 
@@ -970,16 +985,25 @@ const Checkout = () => {
               </View>
             )}
 
+            {deliveryZone ? (
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Delivery Zone</Text>
+                <Text style={styles.summaryValue}>{deliveryZone}</Text>
+              </View>
+            ) : null}
+
+            {userKm > 0 ? (
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Distance (KM)</Text>
+                <Text style={styles.summaryValue}>{userKm.toFixed(2)} km</Text>
+              </View>
+            ) : null}
+
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Delivery Fee</Text>
               <Text style={styles.summaryValue}>
-                {isServiceable ? `£${deliveryFee.toFixed(2)}` : "N/A"}
+                {isServiceable ? (deliveryFee > 0 ? `£${deliveryFee.toFixed(2)}` : "Free") : "N/A"}
               </Text>
-            </View>
-
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>VAT (20%)</Text>
-              <Text style={styles.summaryValue}>£{vatAmount.toFixed(2)}</Text>
             </View>
 
             <View style={[styles.summaryRow, styles.totalRow]}>
