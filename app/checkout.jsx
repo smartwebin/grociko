@@ -61,13 +61,34 @@ const Checkout = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
-  const calculateVATAmount = () => {
-    let vatAmount = 0;
-    // VAT is already hidden or handled separately, just returning 0 so we remove unwanted VAT.
-    return vatAmount;
-  };
+  let subtotalExVat = 0;
+  let totalVat = 0;
+  let subtotalIncVat = 0;
 
-  const subtotal = parseFloat(formattedPrice.replace(/[£$,]/g, "")) || 0;
+  items.forEach((item) => {
+    const tax_rate = parseFloat(item.tax) || 0;
+    const unitPrice = parseFloat(item.sellingPrice || item.price || 0);
+    
+    let unit_ex_vat = 0;
+    let unit_vat = 0;
+    let unit_inc_vat = 0;
+    
+    if (item.includes_tax === 'yes') {
+      unit_ex_vat = unitPrice;
+      unit_vat = unit_ex_vat * (tax_rate / 100);
+      unit_inc_vat = unit_ex_vat + unit_vat;
+    } else {
+      unit_ex_vat = unitPrice;
+      unit_vat = 0;
+      unit_inc_vat = unit_ex_vat;
+    }
+    
+    subtotalExVat += (unit_ex_vat * item.quantity);
+    totalVat += (unit_vat * item.quantity);
+    subtotalIncVat += (unit_inc_vat * item.quantity);
+  });
+
+  const subtotal = subtotalIncVat;
   const promoDiscount = appliedPromo
     ? appliedPromo.offer_percentage &&
       parseFloat(appliedPromo.offer_percentage) > 0
@@ -75,8 +96,7 @@ const Checkout = () => {
       : parseFloat(appliedPromo.offer_price || 0)
     : 0;
   const discountedSubtotal = subtotal - promoDiscount;
-  const vatAmount = calculateVATAmount();
-  // Total no longer adds VAT, because the subtotal is already tax-inclusive
+  const vatAmount = totalVat;
   const totalAmount = discountedSubtotal + deliveryFee;
 
   const paymentMethods = [
@@ -424,6 +444,14 @@ const Checkout = () => {
       const { error: initError } = await initPaymentSheet({
         merchantDisplayName: "Grociko",
         paymentIntentClientSecret: paymentIntentResponse.data.client_secret,
+        applePay: {
+          merchantCountryCode: "GB",
+        },
+        googlePay: {
+          merchantCountryCode: "GB",
+          testEnv: true, // You can set this to false when going to production
+          currencyCode: "GBP",
+        },
         defaultBillingDetails: {
           name: userData.name,
           email: userData.email,
@@ -705,10 +733,25 @@ const Checkout = () => {
             </View>
 
             {items.map((item, index) => {
-              // Calculate VAT if applicable (Extract from inclusive price)
-              const taxRate = (item.includes_tax === "yes" && item.tax > 0) ? item.tax : 0;
-              const itemTotal = item.sellingPrice * item.quantity; // selling price is inclusive
-              const itemVatAmount = (itemTotal * taxRate) / (100 + taxRate);
+              const taxRate = parseFloat(item.tax) || 0;
+              const unitPrice = parseFloat(item.sellingPrice || item.price || 0);
+              let unit_ex_vat = 0;
+              let unit_vat = 0;
+              let unit_inc_vat = 0;
+
+              if (item.includes_tax === "yes") {
+                unit_ex_vat = unitPrice;
+                unit_vat = unit_ex_vat * (taxRate / 100);
+                unit_inc_vat = unit_ex_vat + unit_vat;
+              } else {
+                unit_ex_vat = unitPrice;
+                unit_vat = 0;
+                unit_inc_vat = unit_ex_vat;
+              }
+
+              const itemExVat = unit_ex_vat * item.quantity;
+              const itemVatAmount = unit_vat * item.quantity;
+              const itemTotal = unit_inc_vat * item.quantity;
 
               return (
                 <View key={item.id} style={styles.orderItem}>
@@ -724,13 +767,11 @@ const Checkout = () => {
                       {item.name}
                     </Text>
                     <Text style={styles.orderItemDetails}>
-                      {item.quantity} x £{item.sellingPrice.toFixed(2)}
+                      {item.quantity} x £{unitPrice.toFixed(2)}
                     </Text>
-                    {item.includes_tax === "yes" && item.tax > 0 && (
-                      <Text style={styles.vatDetails}>
-                        Includes VAT: £{itemVatAmount.toFixed(2)}
-                      </Text>
-                    )}
+                    <Text style={styles.vatDetails}>
+                      Ex. VAT: £{itemExVat.toFixed(2)} | VAT ({taxRate}%): £{itemVatAmount.toFixed(2)}
+                    </Text>
                   </View>
                   <Text style={styles.orderItemTotal}>
                     £{itemTotal.toFixed(2)}
@@ -968,6 +1009,16 @@ const Checkout = () => {
           {/* Order Summary */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Order Summary</Text>
+
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Subtotal (Ex. VAT)</Text>
+              <Text style={styles.summaryValue}>£{subtotalExVat.toFixed(2)}</Text>
+            </View>
+
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>VAT</Text>
+              <Text style={styles.summaryValue}>£{vatAmount.toFixed(2)}</Text>
+            </View>
 
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Subtotal (Inc. VAT)</Text>

@@ -41,8 +41,34 @@ const Cart = () => {
     }
   }, [ageRestrictedItems.length]);
 
-  const subtotal = parseFloat(formattedPrice.replace(/[£$,]/g, "")) || 0;
-  const total = subtotal;
+  let subtotalExVat = 0;
+  let totalVat = 0;
+  let totalIncVat = 0;
+
+  items.forEach(item => {
+    const tax_rate = parseFloat(item.tax) || 0;
+    const unitPrice = parseFloat(item.sellingPrice || item.price || 0);
+    
+    let unit_ex_vat = 0;
+    let unit_vat = 0;
+    let unit_inc_vat = 0;
+    
+    if (item.includes_tax === 'yes') {
+      unit_ex_vat = unitPrice;
+      unit_vat = unit_ex_vat * (tax_rate / 100);
+      unit_inc_vat = unit_ex_vat + unit_vat;
+    } else {
+      unit_ex_vat = unitPrice;
+      unit_vat = 0;
+      unit_inc_vat = unit_ex_vat;
+    }
+    
+    subtotalExVat += (unit_ex_vat * item.quantity);
+    totalVat += (unit_vat * item.quantity);
+    totalIncVat += (unit_inc_vat * item.quantity);
+  });
+
+  const total = totalIncVat;
 
   const handleRemoveItem = (itemId) => {
     removeFromCart(itemId);
@@ -75,15 +101,32 @@ const Cart = () => {
 
   const handleCheckout = () => {
     if (ageRestrictedItems.length > 0 && !ageAcknowledged) {
-      setShowAgeModal(true);
+      Alert.alert("Age Verification Required", "Please check the age confirmation box to proceed.");
       return;
     }
     router.push("/checkout");
   };
 
   const renderCartItem = ({ item }) => {
-    const itemTotalPrice = (item.sellingPrice || item.price || 0) * item.quantity;
-    // {console.log("item",item)}
+    const tax_rate = parseFloat(item.tax) || 0;
+    const unitPrice = parseFloat(item.sellingPrice || item.price || 0);
+    let unit_ex_vat = 0;
+    let unit_vat = 0;
+    let unit_inc_vat = 0;
+
+    if (item.includes_tax === 'yes') {
+      unit_ex_vat = unitPrice;
+      unit_vat = unit_ex_vat * (tax_rate / 100);
+      unit_inc_vat = unit_ex_vat + unit_vat;
+    } else {
+      unit_ex_vat = unitPrice;
+      unit_vat = 0;
+      unit_inc_vat = unit_ex_vat;
+    }
+
+    const p_ex_vat = unit_ex_vat * item.quantity;
+    const p_vat = unit_vat * item.quantity;
+    const p_inc_vat = unit_inc_vat * item.quantity;
     return (
       <View style={styles.cartItem}>
         <Image
@@ -111,6 +154,11 @@ const Cart = () => {
             </TouchableOpacity>
           </View>
 
+          {item.age_verification_req === 'yes' && (
+            <View style={{ backgroundColor: '#f44336', alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginTop: 4 }}>
+              <Text style={{ color: '#fff', fontSize: 10, fontWeight: 'bold' }}>Age Restricted {item.age}+</Text>
+            </View>
+          )}
           <Text style={styles.productUnit}>{item.unit}</Text>
 
           <View style={styles.itemFooter}>
@@ -153,12 +201,9 @@ const Cart = () => {
             </View>
 
             <View style={styles.priceContainer}>
-              <Text style={styles.itemPrice}>£{itemTotalPrice.toFixed(2)}</Text>
-              {item.includes_tax === "yes" && parseFloat(item.tax) > 0 && (
-                <Text style={styles.vatDetails}>
-                  (Inclusive of all taxes)
-                </Text>
-              )}
+              <Text style={styles.itemPrice}>£{p_inc_vat.toFixed(2)}</Text>
+              <Text style={{ fontSize: 11, color: theme.colors.text.secondary }}>Ex. VAT: £{p_ex_vat.toFixed(2)}</Text>
+              <Text style={{ fontSize: 11, color: theme.colors.text.secondary }}>VAT ({tax_rate}%): £{p_vat.toFixed(2)}</Text>
               {item.availableStock && item.quantity >= item.availableStock && (
                 <Text style={styles.stockLimitText}>Max stock</Text>
               )}
@@ -220,19 +265,37 @@ const Cart = () => {
             <>
               <View style={styles.summarySection}>
                 <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Subtotal</Text>
+                  <Text style={styles.summaryLabel}>Subtotal (Ex. VAT)</Text>
                   <Text style={styles.summaryValue}>
-                    £{subtotal.toFixed(2)}
+                    £{subtotalExVat.toFixed(2)}
+                  </Text>
+                </View>
+
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>VAT</Text>
+                  <Text style={styles.summaryValue}>
+                    £{totalVat.toFixed(2)}
                   </Text>
                 </View>
 
                 <View style={[styles.summaryRow, styles.totalRow]}>
-                  <Text style={styles.totalLabel}>Total</Text>
+                  <Text style={styles.totalLabel}>Subtotal (Inc. VAT)</Text>
                   <Text style={styles.totalValue}>
-                    £{total.toFixed(2)}
+                    £{totalIncVat.toFixed(2)}
                   </Text>
                 </View>
               </View>
+
+              {ageRestrictedItems.length > 0 && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                  <TouchableOpacity onPress={() => setAgeAcknowledged(!ageAcknowledged)} style={{ marginRight: 10 }}>
+                    <Ionicons name={ageAcknowledged ? "checkbox" : "square-outline"} size={24} color={ageAcknowledged ? theme.colors.primary.main : theme.colors.text.secondary} />
+                  </TouchableOpacity>
+                  <Text style={{ flex: 1, fontSize: 12, color: theme.colors.text.secondary }}>
+                    I confirm that I am at least {highestAge} years old to purchase the age-restricted items in my cart.
+                  </Text>
+                </View>
+              )}
 
               {/* Checkout Section */}
               <View style={styles.checkoutSection}>
@@ -253,62 +316,7 @@ const Cart = () => {
         {/* Cart Summary */}
       </View>
 
-      {/* Age Restriction Modal */}
-      <Modal
-        visible={showAgeModal}
-        transparent={true}
-        animationType="fade"
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.ageModalContainer}>
-            <View style={styles.ageModalHeader}>
-              <Ionicons name="warning" size={24} color="#f44336" />
-              <Text style={styles.ageModalTitle}>Age Restriction Warning</Text>
-            </View>
-            <Text style={styles.ageModalText}>
-              Your cart contains age-restricted items. You must meet the required age to purchase these products:
-            </Text>
 
-            <View style={styles.ageItemsList}>
-              {ageRestrictedItems.map((item) => (
-                <View key={item.id} style={styles.ageItemRow}>
-                  <Text style={styles.ageItemName} numberOfLines={1}>{item.name}</Text>
-                  <View style={styles.ageBadge}>
-                    <Text style={styles.ageBadgeText}>{item.age}+</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-
-            <Text style={styles.ageConfirmText}>
-              By proceeding, you confirm that you are at least {highestAge} years old.
-            </Text>
-
-            <View style={styles.ageModalActions}>
-              <TouchableOpacity
-                style={styles.ageRemoveButton}
-                onPress={() => {
-                  ageRestrictedItems.forEach(item => removeFromCart(item.id));
-                  setShowAgeModal(false);
-                }}
-              >
-                <Text style={styles.ageRemoveText}>Remove Items</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.ageAckButton}
-                onPress={() => {
-                  setAgeAcknowledged(true);
-                  setShowAgeModal(false);
-                  router.push("/checkout");
-                }}
-              >
-                <Text style={styles.ageAckText}>I Acknowledge</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaWrapper>
   );
 };

@@ -209,8 +209,8 @@ const AddAddress = () => {
       district: address.district || "",
       ward: address.ward || "",
       landmark: formData.landmark || "",
-      latitude: formData.latitude || "",
-      longitude: formData.longitude || "",
+      latitude: address.latitude || formData.latitude || "",
+      longitude: address.longitude || formData.longitude || "",
     });
 
     setAddressListModalVisible(false);
@@ -518,35 +518,7 @@ const AddAddress = () => {
               />
             </View>
             
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Latitude</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.latitude}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, latitude: text })
-                }
-                placeholder="e.g. 51.5074"
-                placeholderTextColor={theme.colors.text.placeholder}
-                keyboardType="numeric"
-                editable={!saving}
-              />
-            </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Longitude</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.longitude}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, longitude: text })
-                }
-                placeholder="e.g. -0.1278"
-                placeholderTextColor={theme.colors.text.placeholder}
-                keyboardType="numeric"
-                editable={!saving}
-              />
-            </View>
           </View>
         </ScrollView>
         <View
