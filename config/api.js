@@ -1,8 +1,8 @@
 // API Configuration for grociko App
 export const API_CONFIG = {
   // Base URLs
-  BASE_URL: "http://192.168.1.5/Zen/grociko/api",
-  BASE_IMG_URL: "http://192.168.1.5/Zen/grociko/photos",
+  BASE_URL: "https://work.phpwebsites.in/grociko/api",
+  BASE_IMG_URL: "https://work.phpwebsites.in/grociko/photos",
   // BASE_URL: "https://work.phpwebsites.in/grociko/api",
   // BASE_IMG_URL: "https://work.phpwebsites.in/grociko/photos",
   // BASE_URL: "http://192.168.1.3/Zen/grociko/api",
@@ -45,9 +45,9 @@ export const getImageUrl = (imageName, size = "large") => {
   if (!imageName) return null;
 
   const sizeUrls = {
-    large: "http://192.168.1.5/Zen/grociko/photos/large",
-    medium: "http://192.168.1.5/Zen/grociko/photos/medium",
-    small: "http://192.168.1.5/Zen/grociko/photos/small",
+    large: "https://work.phpwebsites.in/grociko/photos/large",
+    medium: "https://work.phpwebsites.in/grociko/photos/medium",
+    small: "https://work.phpwebsites.in/grociko/photos/small",
   };
 
   return `${sizeUrls[size] || sizeUrls.large}/${imageName}`;
