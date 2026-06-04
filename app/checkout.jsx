@@ -692,15 +692,16 @@ const Checkout = () => {
                   />
                 </View>
                 <View style={styles.addressInfo}>
-                  <Text style={styles.addressType}>
-                    {selectedAddress.address1}
-                  </Text>
-                  <Text style={styles.addressText}>
-                    {selectedAddress.address2}
-                    {selectedAddress.address3
-                      ? `, ${selectedAddress.address3}`
-                      : ""}
-                  </Text>
+                  {selectedAddress.address1 && (
+                    <Text style={styles.addressType}>
+                      {selectedAddress.address1}
+                    </Text>
+                  )}
+                  {(selectedAddress.address2 || selectedAddress.address3) && (
+                    <Text style={styles.addressText}>
+                      {[selectedAddress.address2, selectedAddress.address3].filter(Boolean).join(", ")}
+                    </Text>
+                  )}
                   <Text style={styles.addressCity}>
                     {selectedAddress.city}, {selectedAddress.pincode}
                   </Text>
@@ -1157,10 +1158,10 @@ const Checkout = () => {
                       />
                       <View style={styles.addressOptionText}>
                         <Text style={styles.addressOptionTitle}>
-                          {address.address1}
+                          {[address.address1, address.address2, address.address3].filter(Boolean).join(", ") || "Delivery Address"}
                         </Text>
                         <Text style={styles.addressOptionAddress}>
-                          {address.address2}, {address.city}
+                          {[address.city, address.pincode].filter(Boolean).join(", ")}
                         </Text>
                       </View>
                     </View>
