@@ -471,6 +471,35 @@ const Orders = () => {
                       )}
                     </View>
 
+                    {/* Delivery Address */}
+                    {selectedOrder.address && (
+                      <View style={styles.addressSection}>
+                        <Text style={styles.sectionTitle}>Delivery Address</Text>
+                        <View style={styles.addressCard}>
+                          <Text style={styles.addressText}>
+                            {selectedOrder.address.address1}
+                            {selectedOrder.address.address2 ? `, ${selectedOrder.address.address2}` : ""}
+                            {selectedOrder.address.address3 ? `, ${selectedOrder.address.address3}` : ""}
+                          </Text>
+                          <Text style={styles.addressText}>{selectedOrder.address.city} - {selectedOrder.address.pincode}</Text>
+                          {selectedOrder.address.landmark && (
+                            <Text style={styles.addressText}>Landmark: {selectedOrder.address.landmark}</Text>
+                          )}
+                          <Text style={styles.addressText}>Phone: {selectedOrder.address.phone}</Text>
+                        </View>
+                      </View>
+                    )}
+
+                    {/* Order Comments */}
+                    {selectedOrder.comment && selectedOrder.comment !== "" && (
+                      <View style={styles.addressSection}>
+                        <Text style={styles.sectionTitle}>Order Comments</Text>
+                        <View style={styles.addressCard}>
+                          <Text style={styles.addressText}>{selectedOrder.comment}</Text>
+                        </View>
+                      </View>
+                    )}
+
                     {/* Items List */}
                     <View style={styles.itemsSection}>
                       <Text style={styles.sectionTitle}>Items Ordered</Text>
@@ -523,10 +552,17 @@ const Orders = () => {
                       <Text style={styles.sectionTitle}>Billing Details</Text>
                       <View style={styles.billingCard}>
                         <View style={styles.billingRow}>
-                          <Text style={styles.billingLabel}>Subtotal</Text>
+                          <Text style={styles.billingLabel}>Subtotal (Ex. VAT)</Text>
                           <Text style={styles.billingValue}>
                             £
-                            {parseFloat(selectedOrder.subtotal || 0).toFixed(2)}
+                            {parseFloat((selectedOrder.subtotal || 0) - (selectedOrder.vat || 0)).toFixed(2)}
+                          </Text>
+                        </View>
+                        <View style={styles.billingRow}>
+                          <Text style={styles.billingLabel}>VAT</Text>
+                          <Text style={styles.billingValue}>
+                            £
+                            {parseFloat(selectedOrder.vat || 0).toFixed(2)}
                           </Text>
                         </View>
                         <View style={styles.billingRow}>
@@ -934,6 +970,22 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Medium",
     color: theme.colors.status.success,
     marginTop: theme.spacing.sm,
+  },
+  addressSection: {
+    marginBottom: theme.spacing.xl,
+  },
+  addressCard: {
+    backgroundColor: theme.colors.surface.card,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.surface.border,
+  },
+  addressText: {
+    fontSize: theme.typography.fontSize.base,
+    fontFamily: "Outfit-Regular",
+    color: theme.colors.text.secondary,
+    lineHeight: 24,
   },
   itemsSection: {
     marginBottom: theme.spacing.xl,

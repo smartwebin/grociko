@@ -24,6 +24,7 @@ const initialState = {
   totalPrice: 0,
   isLoading: false,
   error: null,
+  isInitialized: false,
 };
 
 // Cart Reducer
@@ -37,6 +38,7 @@ const cartReducer = (state, action) => {
         totalItems: calculateTotalItems(action.payload.items || []),
         totalPrice: calculateTotalPrice(action.payload.items || []),
         isLoading: false,
+        isInitialized: true,
       };
 
     case CART_ACTIONS.ADD_ITEM:
@@ -166,10 +168,10 @@ export const CartProvider = ({ children }) => {
 
   // Save cart data to AsyncStorage whenever it changes
   useEffect(() => {
-    if (state.items.length > 0 || state.favorites.length > 0) {
+    if (state.isInitialized) {
       saveCartToStorage();
     }
-  }, [state.items, state.favorites]);
+  }, [state.items, state.favorites, state.isInitialized]);
 
   // Load cart from storage
   const loadCartFromStorage = async () => {

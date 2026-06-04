@@ -277,13 +277,6 @@ const Cart = () => {
                     £{totalVat.toFixed(2)}
                   </Text>
                 </View>
-
-                <View style={[styles.summaryRow, styles.totalRow]}>
-                  <Text style={styles.totalLabel}>Subtotal (Inc. VAT)</Text>
-                  <Text style={styles.totalValue}>
-                    £{totalIncVat.toFixed(2)}
-                  </Text>
-                </View>
               </View>
 
               {ageRestrictedItems.length > 0 && (

@@ -29,7 +29,7 @@ const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
-  const [sortBy, setSortBy] = useState("name");
+  const [sortBy, setSortBy] = useState("newest");
   const [showSortModal, setShowSortModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
@@ -227,7 +227,7 @@ const Search = () => {
     setSelectedFilter("all");
     setSelectedSubcategory("all");
     setSearchQuery("");
-    setSortBy("name");
+    setSortBy("newest");
   };
 
   useFocusEffect(
@@ -263,7 +263,7 @@ const Search = () => {
 
         // Reset other filters
         setSearchQuery("");
-        setSortBy("name");
+        setSortBy("newest");
       } else {
         // No params, reset everything
         resetFilters();
@@ -341,6 +341,19 @@ const Search = () => {
           return 0;
       }
     });
+
+  // Log the results for testing
+  useEffect(() => {
+    if (filteredAndSortedProducts.length > 0) {
+      console.log(`🔍 Search Results (Sorted by ${sortBy}):`);
+      console.log(
+        filteredAndSortedProducts
+          .slice(0, 5)
+          .map((p) => `ID: ${p.id} - ${p.name}`)
+          .join("\n")
+      );
+    }
+  }, [sortBy, filteredAndSortedProducts]);
 
   const handleCategoryPress = (filter) => {
     setSelectedFilter(filter.id);
