@@ -584,7 +584,7 @@ const Orders = () => {
                             <Text style={styles.billingValue}>
                               {selectedOrder.deliveryZone}
                               {selectedOrder.userKm && parseFloat(selectedOrder.userKm) > 0
-                                ? ` (${(Math.floor(parseFloat(selectedOrder.userKm) * 100) / 100).toFixed(2)}km)`
+                                ? ` (${(Math.floor(parseFloat(selectedOrder.userKm) * 100) / 100).toFixed(2)} miles)`
                                 : ""}
                             </Text>
                           </View>

@@ -1043,8 +1043,8 @@ const Checkout = () => {
 
             {userKm > 0 ? (
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Distance (KM)</Text>
-                <Text style={styles.summaryValue}>{userKm.toFixed(2)} km</Text>
+                <Text style={styles.summaryLabel}>Distance (Miles)</Text>
+                <Text style={styles.summaryValue}>{userKm.toFixed(2)} miles</Text>
               </View>
             ) : null}
 
