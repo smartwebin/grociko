@@ -68,11 +68,11 @@ const Checkout = () => {
   items.forEach((item) => {
     const tax_rate = parseFloat(item.tax) || 0;
     const unitPrice = parseFloat(item.sellingPrice || item.price || 0);
-    
+
     let unit_ex_vat = 0;
     let unit_vat = 0;
     let unit_inc_vat = 0;
-    
+
     if (item.includes_tax === 'yes') {
       unit_ex_vat = unitPrice;
       unit_vat = unit_ex_vat * (tax_rate / 100);
@@ -82,7 +82,7 @@ const Checkout = () => {
       unit_vat = 0;
       unit_inc_vat = unit_ex_vat;
     }
-    
+
     subtotalExVat += (unit_ex_vat * item.quantity);
     totalVat += (unit_vat * item.quantity);
     subtotalIncVat += (unit_inc_vat * item.quantity);
@@ -449,7 +449,7 @@ const Checkout = () => {
         },
         googlePay: {
           merchantCountryCode: "GB",
-          testEnv: true, // You can set this to false when going to production
+          testEnv: false, // Set to false for production Google Pay
           currencyCode: "GBP",
         },
         defaultBillingDetails: {
@@ -792,7 +792,7 @@ const Checkout = () => {
                 style={[
                   styles.paymentMethod,
                   selectedPaymentMethod === method.id &&
-                    styles.selectedPaymentMethod,
+                  styles.selectedPaymentMethod,
                   !isServiceable && styles.paymentMethodDisabled,
                 ]}
                 onPress={() =>
@@ -805,7 +805,7 @@ const Checkout = () => {
                     style={[
                       styles.radioButton,
                       selectedPaymentMethod === method.id &&
-                        styles.radioButtonSelected,
+                      styles.radioButtonSelected,
                     ]}
                   >
                     {selectedPaymentMethod === method.id && (
@@ -820,8 +820,8 @@ const Checkout = () => {
                         !isServiceable
                           ? theme.colors.text.muted
                           : selectedPaymentMethod === method.id
-                          ? theme.colors.primary.main
-                          : theme.colors.text.secondary
+                            ? theme.colors.primary.main
+                            : theme.colors.text.secondary
                       }
                     />
                   </View>
@@ -969,7 +969,7 @@ const Checkout = () => {
                           </Text>
                           <Text style={styles.promoSuggestionDesc}>
                             {promo.offer_percentage &&
-                            parseFloat(promo.offer_percentage) > 0
+                              parseFloat(promo.offer_percentage) > 0
                               ? `${promo.offer_percentage}% OFF`
                               : `£${promo.offer_price} OFF`}
                             {promo.minimum_order &&
@@ -1067,7 +1067,7 @@ const Checkout = () => {
               style={[
                 styles.placeOrderButton,
                 (placing || processingPayment || !isServiceable || verifying) &&
-                  styles.placeOrderButtonDisabled,
+                styles.placeOrderButtonDisabled,
               ]}
               onPress={handlePlaceOrder}
               disabled={
@@ -1084,8 +1084,8 @@ const Checkout = () => {
                     {verifying
                       ? "Verifying..."
                       : processingPayment
-                      ? "Processing Payment..."
-                      : "Placing Order..."}
+                        ? "Processing Payment..."
+                        : "Placing Order..."}
                   </Text>
                 </View>
               ) : (
@@ -1094,8 +1094,8 @@ const Checkout = () => {
                     {!isServiceable
                       ? "Delivery Unavailable"
                       : selectedPaymentMethod === "card"
-                      ? "Pay Now"
-                      : "Place Order"}
+                        ? "Pay Now"
+                        : "Place Order"}
                   </Text>
                   {isServiceable && (
                     <Text style={styles.placeOrderPrice}>
@@ -1142,7 +1142,7 @@ const Checkout = () => {
                     style={[
                       styles.addressOption,
                       selectedAddress?.id === address.id &&
-                        styles.selectedAddressOption,
+                      styles.selectedAddressOption,
                     ]}
                     onPress={() => handleSelectAddress(address)}
                   >
