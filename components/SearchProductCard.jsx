@@ -7,9 +7,19 @@ const SearchProductCard = ({ item, onPress, cardWidth }) => {
   const { addToCart, updateQuantity, getItemQuantity } = useCart();
   const quantity = getItemQuantity(item.id);
 
+  // Calculate tax-inclusive prices
+  const taxRate = parseFloat(item.tax) || 0;
+  const isTaxInclusive = item.includes_tax === "yes" && taxRate > 0;
+  const displayPrice = isTaxInclusive
+    ? item.sellingPrice * (1 + taxRate / 100)
+    : item.sellingPrice;
+  const displayMrp = isTaxInclusive && item.mrp
+    ? item.mrp * (1 + taxRate / 100)
+    : item.mrp;
+
   // Calculate discount percentage
-  const discount = item.mrp > item.sellingPrice 
-    ? Math.round(((item.mrp - item.sellingPrice) / item.mrp) * 100) 
+  const discount = displayMrp > displayPrice 
+    ? Math.round(((displayMrp - displayPrice) / displayMrp) * 100) 
     : 0;
 
   // Get image URL
@@ -81,10 +91,10 @@ const SearchProductCard = ({ item, onPress, cardWidth }) => {
 
         {/* Price Info */}
         <View style={styles.priceInfo}>
-          {item.mrp > item.sellingPrice && (
-            <Text style={styles.originalPrice}>£{item.mrp.toFixed(2)}</Text>
+          {displayMrp > displayPrice && (
+            <Text style={styles.originalPrice}>£{displayMrp.toFixed(2)}</Text>
           )}
-          <Text style={styles.price}>£{item.sellingPrice.toFixed(2)}</Text>
+          <Text style={styles.price}>£{displayPrice.toFixed(2)}</Text>
         </View>
 
         {/* Tax Inclusive text */}

@@ -80,6 +80,8 @@ export default function ProductDetail() {
       availableStock: product.quantity,
       includes_tax: product.includes_tax || "no",
       tax: parseFloat(product.tax) || 0,
+      age_verification_req: product.age_verification_req || "no",
+      age: product.age || "18",
     };
     addToCart(cartProduct, 1);
   };
@@ -184,15 +186,20 @@ export default function ProductDetail() {
     );
   }
 
+  // Calculate tax-inclusive prices
+  const taxRate = parseFloat(product?.tax) || 0;
+  const isTaxInclusive = product?.includes_tax === "yes" && taxRate > 0;
+  const displayPrice = isTaxInclusive && product?.sale_price
+    ? parseFloat(product.sale_price) * (1 + taxRate / 100)
+    : parseFloat(product?.sale_price || 0);
+  const displayMrp = isTaxInclusive && product?.mrp
+    ? parseFloat(product.mrp) * (1 + taxRate / 100)
+    : parseFloat(product?.mrp || 0);
+
   // Calculate discount percentage
-  const discountPercentage =
-    product.mrp && product.sale_price
-      ? Math.round(
-          ((parseFloat(product.mrp) - parseFloat(product.sale_price)) /
-            parseFloat(product.mrp)) *
-            100,
-        )
-      : 0;
+  const discountPercentage = displayMrp && displayPrice && displayMrp > displayPrice
+    ? Math.round(((displayMrp - displayPrice) / displayMrp) * 100)
+    : 0;
 
   return (
     <SafeAreaWrapper2>
@@ -294,6 +301,11 @@ export default function ProductDetail() {
                   <Text style={styles.tagText}>{product.category}</Text>
                 </View>
               )}
+              {product.age_verification_req === 'yes' && (
+                <View style={{ backgroundColor: '#f44336', alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginRight: 8, marginBottom: 4 }}>
+                  <Text style={{ color: '#fff', fontSize: 10, fontFamily: 'Outfit-Bold' }}>Age Restricted {product.age}+</Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -344,16 +356,15 @@ export default function ProductDetail() {
             </View>
 
             <View style={styles.priceContainer}>
-              {product.mrp &&
-                parseFloat(product.mrp) > parseFloat(product.sale_price) && (
+              {displayMrp > displayPrice && (
                   <Text style={styles.originalPrice}>
-                    £{parseFloat(product.mrp).toFixed(2)}
+                    £{displayMrp.toFixed(2)}
                   </Text>
                 )}
               <Text style={styles.price}>
-                £{parseFloat(product.sale_price).toFixed(2)}
+                £{displayPrice.toFixed(2)}
               </Text>
-              {product.vat_cat === "B" && (
+              {isTaxInclusive && (
                 <Text style={styles.taxInclusiveText}>
                   (Inclusive of all taxes)
                 </Text>

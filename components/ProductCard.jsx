@@ -51,6 +51,16 @@ const ProductCard = ({ item, onPress }) => {
   const isLowStock = item.quantity && item.quantity <= 10 && item.quantity > 0;
   const isStockLimitReached = item.quantity && quantity >= item.quantity;
 
+  // Calculate tax-inclusive prices
+  const taxRate = parseFloat(item.tax) || 0;
+  const isTaxInclusive = item.includes_tax === "yes" && taxRate > 0;
+  const displayPrice = isTaxInclusive
+    ? item.sellingPrice * (1 + taxRate / 100)
+    : item.sellingPrice;
+  const displayMrp = isTaxInclusive && item.mrp
+    ? item.mrp * (1 + taxRate / 100)
+    : item.mrp;
+
   return (
     <View style={styles.container}>
       {/* Clickable area for navigation - Image, Title, Price */}
@@ -113,9 +123,11 @@ const ProductCard = ({ item, onPress }) => {
 
           <View style={styles.priceContainer}>
             <View style={styles.priceRow}>
-              <Text style={styles.mrpPrice}>£{item.mrp.toFixed(2)}</Text>
+              {displayMrp > 0 && (
+                <Text style={styles.mrpPrice}>£{displayMrp.toFixed(2)}</Text>
+              )}
               <Text style={styles.sellingPrice}>
-                £{item.sellingPrice.toFixed(2)}
+                £{displayPrice.toFixed(2)}
               </Text>
             </View>
 
