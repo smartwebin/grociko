@@ -36,7 +36,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StripeProvider
         publishableKey={STRIPE_CONFIG.PUBLISHABLE_KEY}
-        merchantIdentifier="merchant.com.grociko"
+        merchantIdentifier="merchant.com.magnusinnovations.grociko"
         urlScheme="grociko"
       >
         <UserProvider>
