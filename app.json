@@ -2,7 +2,7 @@
   "expo": {
     "name": "Grociko",
     "slug": "grociko",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "grociko",
@@ -13,7 +13,8 @@
       "bundleIdentifier": "com.magnusinnovations.grociko",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "buildNumber": "9"
     },
     "androidStatusBar": {
       "backgroundColor": "#FFFFFF",
@@ -30,7 +31,7 @@
       "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false,
       "package": "com.magnusinnovations.grociko",
-      "versionCode": 8
+      "versionCode": 9
     },
     "web": {
       "output": "static",
