@@ -446,6 +446,13 @@ const Checkout = () => {
         paymentIntentClientSecret: paymentIntentResponse.data.client_secret,
         applePay: {
           merchantCountryCode: "GB",
+          cartItems: [
+            {
+              label: "Grociko Order",
+              amount: `${totalAmount.toFixed(2)}`,
+              paymentType: "Immediate",
+            },
+          ],
         },
         googlePay: {
           merchantCountryCode: "GB",

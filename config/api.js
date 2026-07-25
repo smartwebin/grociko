@@ -3,8 +3,8 @@ export const API_CONFIG = {
   // Base URLs
   BASE_URL: "https://grociko.co.uk/api",
   BASE_IMG_URL: "https://grociko.co.uk/photos",
-  // BASE_URL: "https://grociko.co.uk/api",
-  // BASE_IMG_URL: "https://grociko.co.uk/photos",
+  // BASE_URL: "http://192.168.1.5/Zen/grociko/api",
+  // BASE_IMG_URL: "http://192.168.1.5/Zen/grociko/photos",
   // BASE_URL: "http://192.168.1.3/Zen/grociko/api",
   // BASE_IMG_URL: "http://192.168.1.3/Zen/grociko/photos",
 
