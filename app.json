@@ -2,7 +2,7 @@
   "expo": {
     "name": "Grociko",
     "slug": "grociko",
-    "version": "1.0.10",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "grociko",
@@ -31,7 +31,7 @@
       "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false,
       "package": "com.magnusinnovations.grociko",
-      "versionCode": 9
+      "versionCode": 5
     },
     "web": {
       "output": "static",
@@ -94,7 +94,9 @@
         "behavior": "inset-swipe",
         "position": "relative"
       },
-      "eas": {}
+      "eas": {
+        "projectId": "15fc78d9-0643-41ee-ac38-f7b0bdfb01bd"
+      }
     }
   }
 }
