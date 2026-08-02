@@ -88,6 +88,7 @@ const Checkout = () => {
     subtotalIncVat += (unit_inc_vat * item.quantity);
   });
 
+  const isClickAndCollect = selectedPaymentMethod === "cod";
   const subtotal = subtotalIncVat;
   const promoDiscount = appliedPromo
     ? appliedPromo.offer_percentage &&
@@ -97,7 +98,8 @@ const Checkout = () => {
     : 0;
   const discountedSubtotal = subtotal - promoDiscount;
   const vatAmount = totalVat;
-  const totalAmount = discountedSubtotal + deliveryFee;
+  const effectiveDeliveryFee = isClickAndCollect ? 0 : deliveryFee;
+  const totalAmount = discountedSubtotal + effectiveDeliveryFee;
 
   const paymentMethods = [
     {
@@ -582,7 +584,7 @@ const Checkout = () => {
       return;
     }
 
-    if (!isServiceable) {
+    if (!isClickAndCollect && !isServiceable) {
       Alert.alert("Delivery Not Available", serviceabilityMessage);
       return;
     }
@@ -639,7 +641,7 @@ const Checkout = () => {
           showsVerticalScrollIndicator={false}
         >
           {/* Serviceability Warning Message */}
-          {!isServiceable && serviceabilityMessage && (
+          {!isServiceable && serviceabilityMessage && !isClickAndCollect && (
             <View style={styles.warningBanner}>
               <View style={styles.warningContent}>
                 <Ionicons
@@ -793,66 +795,69 @@ const Checkout = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Payment Method</Text>
 
-            {paymentMethods.map((method) => (
-              <TouchableOpacity
-                key={method.id}
-                style={[
-                  styles.paymentMethod,
-                  selectedPaymentMethod === method.id &&
-                  styles.selectedPaymentMethod,
-                  !isServiceable && styles.paymentMethodDisabled,
-                ]}
-                onPress={() =>
-                  isServiceable && handlePaymentMethodSelect(method)
-                }
-                disabled={!isServiceable}
-              >
-                <View style={styles.paymentMethodContent}>
-                  <View
-                    style={[
-                      styles.radioButton,
-                      selectedPaymentMethod === method.id &&
-                      styles.radioButtonSelected,
-                    ]}
-                  >
-                    {selectedPaymentMethod === method.id && (
-                      <View style={styles.radioButtonInner} />
-                    )}
-                  </View>
-                  <View style={styles.paymentIconContainer}>
-                    <Ionicons
-                      name={method.icon}
-                      size={24}
-                      color={
-                        !isServiceable
-                          ? theme.colors.text.muted
-                          : selectedPaymentMethod === method.id
-                            ? theme.colors.primary.main
-                            : theme.colors.text.secondary
-                      }
-                    />
-                  </View>
-                  <View style={styles.paymentMethodInfo}>
-                    <Text
+            {paymentMethods.map((method) => {
+              const isMethodDisabled = method.id === "card" && !isServiceable;
+              return (
+                <TouchableOpacity
+                  key={method.id}
+                  style={[
+                    styles.paymentMethod,
+                    selectedPaymentMethod === method.id &&
+                    styles.selectedPaymentMethod,
+                    isMethodDisabled && styles.paymentMethodDisabled,
+                  ]}
+                  onPress={() =>
+                    !isMethodDisabled && handlePaymentMethodSelect(method)
+                  }
+                  disabled={isMethodDisabled}
+                >
+                  <View style={styles.paymentMethodContent}>
+                    <View
                       style={[
-                        styles.paymentMethodName,
-                        !isServiceable && styles.disabledText,
+                        styles.radioButton,
+                        selectedPaymentMethod === method.id &&
+                        styles.radioButtonSelected,
                       ]}
                     >
-                      {method.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.paymentMethodDetails,
-                        !isServiceable && styles.disabledText,
-                      ]}
-                    >
-                      {method.details}
-                    </Text>
+                      {selectedPaymentMethod === method.id && (
+                        <View style={styles.radioButtonInner} />
+                      )}
+                    </View>
+                    <View style={styles.paymentIconContainer}>
+                      <Ionicons
+                        name={method.icon}
+                        size={24}
+                        color={
+                          isMethodDisabled
+                            ? theme.colors.text.muted
+                            : selectedPaymentMethod === method.id
+                              ? theme.colors.primary.main
+                              : theme.colors.text.secondary
+                        }
+                      />
+                    </View>
+                    <View style={styles.paymentMethodInfo}>
+                      <Text
+                        style={[
+                          styles.paymentMethodName,
+                          isMethodDisabled && styles.disabledText,
+                        ]}
+                      >
+                        {method.name}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.paymentMethodDetails,
+                          isMethodDisabled && styles.disabledText,
+                        ]}
+                      >
+                        {method.details}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           {/* Payment Info Note - Only show when online payment is selected */}
@@ -997,7 +1002,7 @@ const Checkout = () => {
           </View>
 
           {/* Free Delivery Info Banner */}
-          {minFreeDeliveryAmount > 0 && discountedSubtotal < minFreeDeliveryAmount && (
+          {!isClickAndCollect && minFreeDeliveryAmount > 0 && discountedSubtotal < minFreeDeliveryAmount && (
             <View style={[styles.section, { paddingBottom: 0, borderBottomWidth: 0 }]}>
               <View style={{
                 backgroundColor: theme.colors.status.info + "15",
@@ -1041,14 +1046,14 @@ const Checkout = () => {
               </View>
             )}
 
-            {deliveryZone ? (
+            {!isClickAndCollect && deliveryZone ? (
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Delivery Zone</Text>
                 <Text style={styles.summaryValue}>{deliveryZone}</Text>
               </View>
             ) : null}
 
-            {userKm > 0 ? (
+            {!isClickAndCollect && userKm > 0 ? (
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Distance (Miles)</Text>
                 <Text style={styles.summaryValue}>{userKm.toFixed(2)} miles</Text>
@@ -1057,15 +1062,15 @@ const Checkout = () => {
 
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Delivery Fee</Text>
-              <Text style={styles.summaryValue}>
-                {isServiceable ? (deliveryFee > 0 ? `£${deliveryFee.toFixed(2)}` : "Free") : "N/A"}
+              <Text style={[styles.summaryValue, isClickAndCollect && { color: theme.colors.status.success }]}>
+                {isClickAndCollect ? "Free (Click & Collect)" : (isServiceable ? (deliveryFee > 0 ? `£${deliveryFee.toFixed(2)}` : "Free") : "N/A")}
               </Text>
             </View>
 
             <View style={[styles.summaryRow, styles.totalRow]}>
               <Text style={styles.totalLabel}>Total</Text>
               <Text style={styles.totalValue}>
-                {isServiceable ? `£${totalAmount.toFixed(2)}` : "N/A"}
+                {isClickAndCollect || isServiceable ? `£${totalAmount.toFixed(2)}` : "N/A"}
               </Text>
             </View>
           </View>
@@ -1073,12 +1078,12 @@ const Checkout = () => {
             <TouchableOpacity
               style={[
                 styles.placeOrderButton,
-                (placing || processingPayment || !isServiceable || verifying) &&
+                (placing || processingPayment || (!isClickAndCollect && !isServiceable) || verifying) &&
                 styles.placeOrderButtonDisabled,
               ]}
               onPress={handlePlaceOrder}
               disabled={
-                placing || processingPayment || !isServiceable || verifying
+                placing || processingPayment || (!isClickAndCollect && !isServiceable) || verifying
               }
             >
               {placing || processingPayment || verifying ? (
@@ -1098,13 +1103,13 @@ const Checkout = () => {
               ) : (
                 <>
                   <Text style={styles.placeOrderText}>
-                    {!isServiceable
+                    {!isClickAndCollect && !isServiceable
                       ? "Delivery Unavailable"
                       : selectedPaymentMethod === "card"
                         ? "Pay Now"
                         : "Place Order"}
                   </Text>
-                  {isServiceable && (
+                  {(isClickAndCollect || isServiceable) && (
                     <Text style={styles.placeOrderPrice}>
                       £{totalAmount.toFixed(2)}
                     </Text>

@@ -570,13 +570,12 @@ const Orders = () => {
                             Delivery Charge
                           </Text>
                           <Text style={styles.billingValue}>
-                            £
-                            {parseFloat(selectedOrder.deliveryFee || 0).toFixed(
-                              2,
-                            )}
+                            {selectedOrder.paymentMethod === "click_and_collect"
+                              ? "Free (Click & Collect)"
+                              : `£${parseFloat(selectedOrder.deliveryFee || 0).toFixed(2)}`}
                           </Text>
                         </View>
-                        {selectedOrder.deliveryZone && (
+                        {selectedOrder.paymentMethod !== "click_and_collect" && selectedOrder.deliveryZone ? (
                           <View style={styles.billingRow}>
                             <Text style={styles.billingLabel}>
                               Delivery Zone
@@ -588,7 +587,7 @@ const Orders = () => {
                                 : ""}
                             </Text>
                           </View>
-                        )}
+                        ) : null}
                         <View style={styles.billingRow}>
                           <Text
                             style={{
