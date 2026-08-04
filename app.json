@@ -76,7 +76,7 @@
         "@stripe/stripe-react-native",
         {
           "merchantIdentifier": "merchant.com.magnusinnovations.grociko",
-          "enableGooglePay": true
+          "enableGooglePay": false
         }
       ]
     ],

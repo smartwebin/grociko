@@ -456,11 +456,6 @@ const Checkout = () => {
             },
           ],
         },
-        googlePay: {
-          merchantCountryCode: "GB",
-          testEnv: false, // Set to false for production Google Pay
-          currencyCode: "GBP",
-        },
         defaultBillingDetails: {
           name: userData.name,
           email: userData.email,
