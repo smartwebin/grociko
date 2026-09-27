@@ -4,6 +4,7 @@ import { useCart } from "@/providers/CartProvider";
 import { getUserData, getUserOrders } from "@/services/apiService";
 import theme from "@/utils/theme";
 import { Ionicons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -180,6 +181,11 @@ const Orders = () => {
         },
       ],
     );
+  };
+
+  const handleCopy = async (text) => {
+    await Clipboard.setStringAsync(text);
+    Alert.alert("Copied!", "Tracking number copied to clipboard", [{ text: "OK" }]);
   };
 
   // Helper function to get payment method display info
@@ -456,7 +462,14 @@ const Orders = () => {
                           {selectedOrder.tracking_number && (
                             <View style={styles.trackingRow}>
                               <Text style={styles.trackingLabel}>Tracking No.:</Text>
-                              <Text style={styles.trackingValue}>{selectedOrder.tracking_number}</Text>
+                              <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
+                                <Text style={styles.trackingValue} selectable={true}>
+                                  {selectedOrder.tracking_number}
+                                </Text>
+                              </ScrollView>
+                              <TouchableOpacity onPress={() => handleCopy(selectedOrder.tracking_number)} style={{ marginLeft: 8, padding: 4 }}>
+                                <Ionicons name="copy-outline" size={18} color={theme.colors.primary.main} />
+                              </TouchableOpacity>
                             </View>
                           )}
                           {selectedOrder.tracking_link && (
@@ -997,7 +1010,7 @@ const styles = StyleSheet.create({
   },
   modalOrderItem: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     backgroundColor: theme.colors.surface.card,
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.md,
@@ -1079,6 +1092,8 @@ const styles = StyleSheet.create({
     paddingTop: theme.spacing.md,
     borderTopWidth: 1,
     borderTopColor: theme.colors.surface.border,
+    width: "100%",
+    alignItems: "flex-start",
   },
   trackingTitle: {
     fontSize: theme.typography.fontSize.sm,
@@ -1088,11 +1103,11 @@ const styles = StyleSheet.create({
   },
   trackingRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 2,
+    alignItems: "flex-start",
+    marginBottom: 4,
   },
   trackingLabel: {
-    width: 100,
+    marginRight: 8,
     fontSize: theme.typography.fontSize.sm,
     fontFamily: "Outfit-Medium",
     color: theme.colors.text.secondary,
@@ -1102,6 +1117,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     fontFamily: "Outfit-Regular",
     color: theme.colors.text.primary,
+    flexWrap: "wrap",
   },
   trackingLink: {
     flex: 1,
@@ -1136,16 +1152,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text.tertiary,
     marginTop: 2,
   },
-  modalOrderItem: {
-    flexDirection: "row",
-    alignItems: "flex-start", // Changed from "center" to "flex-start"
-    backgroundColor: theme.colors.surface.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.surface.border,
-  },
+
 
   modalItemPriceBreakdown: {
     marginTop: theme.spacing.xs,
