@@ -1,9 +1,17 @@
 import { useCart } from '@/providers/CartProvider';
 import theme from '@/utils/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useState, useEffect } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
 
 const SearchProductCard = ({ item, onPress, cardWidth }) => {
+  const [aspectRatio, setAspectRatio] = useState(1);
+
+  useEffect(() => {
+    setAspectRatio(1);
+  }, [item?.image]);
+
   const { addToCart, updateQuantity, getItemQuantity } = useCart();
   const quantity = getItemQuantity(item.id);
 
@@ -62,8 +70,17 @@ const SearchProductCard = ({ item, onPress, cardWidth }) => {
         {item.image ? (
           <Image
             source={{ uri: getImageUrl(item.image) }}
-            style={styles.productImage}
-            resizeMode="contain"
+            style={[
+              styles.productImage,
+              { aspectRatio },
+            ]}
+            contentFit="cover"
+            contentPosition="top center"
+            onLoad={(e) => {
+              if (e?.source?.width && e?.source?.height) {
+                setAspectRatio(Math.max(0.7, Math.min(1.5, e.source.width / e.source.height)));
+              }
+            }}
           />
         ) : (
           <View style={styles.placeholderImage}>
@@ -148,22 +165,22 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: theme.colors.surface.border,
+    justifyContent: 'space-between',
   },
   imageContainer: {
     width: '100%',
-    height: 140,
-    backgroundColor: theme.colors.background.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: theme.colors.surface.white,
     position: 'relative',
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.surface.border,
+    overflow: 'hidden',
   },
   productImage: {
     width: '100%',
-    height: '100%',
   },
   placeholderImage: {
     width: '100%',
-    height: '100%',
+    aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.colors.surface.light,

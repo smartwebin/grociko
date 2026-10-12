@@ -2,9 +2,17 @@ import { useCart } from "@/providers/CartProvider";
 import theme from "@/utils/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState, useEffect } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
 
 const ProductCard = ({ item, onPress }) => {
+  const [aspectRatio, setAspectRatio] = useState(1);
+
+  useEffect(() => {
+    setAspectRatio(1);
+  }, [item?.image]);
+
   const { addToCart, updateQuantity, getItemQuantity } = useCart();
   const quantity = getItemQuantity(item.id);
 
@@ -76,9 +84,16 @@ const ProductCard = ({ item, onPress }) => {
             }
             style={[
               styles.productImage,
+              { aspectRatio },
               isOutOfStock && styles.outOfStockImage,
             ]}
-            resizeMode="contain"
+            contentFit="cover"
+            contentPosition="top center"
+            onLoad={(e) => {
+              if (e?.source?.width && e?.source?.height) {
+                setAspectRatio(Math.max(0.7, Math.min(1.5, e.source.width / e.source.height)));
+              }
+            }}
           />
           {item.tag && (
             <View
@@ -222,21 +237,18 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.md,
     marginLeft: theme.spacing.xs,
     overflow: "hidden",
+    justifyContent: "space-between",
   },
   imageContainer: {
     width: "100%",
-    height: 140,
-    backgroundColor: theme.colors.surface.light,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.sm,
+    backgroundColor: theme.colors.surface.white,
     position: "relative",
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.surface.border,
+    overflow: "hidden",
   },
   productImage: {
     width: "100%",
-    height: "100%",
-    borderRadius: theme.borderRadius.sm,
   },
   outOfStockImage: {
     opacity: 0.4,

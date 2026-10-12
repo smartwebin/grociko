@@ -9,13 +9,13 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Image } from "expo-image";
 
 const { width } = Dimensions.get("window");
 
@@ -33,6 +33,11 @@ export default function ProductDetail() {
   const [isFeature3Expanded, setIsFeature3Expanded] = useState(false);
   const [isFeature4Expanded, setIsFeature4Expanded] = useState(false);
   const [isFeature5Expanded, setIsFeature5Expanded] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState(1);
+
+  useEffect(() => {
+    setAspectRatio(1);
+  }, [product?.id, product?.image]);
 
   const quantity = product ? getItemQuantity(product.id) : 0;
 
@@ -141,7 +146,15 @@ export default function ProductDetail() {
       <Image
         source={{ uri: item }}
         style={styles.productImage}
-        resizeMode="contain"
+        contentFit="cover"
+        contentPosition="top center"
+        onLoad={(e) => {
+          if (e?.source?.width && e?.source?.height) {
+            setAspectRatio(
+              Math.max(0.7, Math.min(1.5, e.source.width / e.source.height))
+            );
+          }
+        }}
       />
     </View>
   );
@@ -227,7 +240,7 @@ export default function ProductDetail() {
 
         {/* Image Carousel */}
         {productImages.length > 0 && (
-          <View style={styles.imageContainer}>
+          <View style={[styles.imageContainer, { aspectRatio }]}>
             <FlatList
               data={productImages}
               renderItem={renderImage}
@@ -577,21 +590,26 @@ const styles = StyleSheet.create({
 
   // Image Carousel Styles
   imageContainer: {
-    height: 350,
-    backgroundColor: theme.colors.surface.light,
-    marginBottom: theme.spacing.xl,
+    width: width - 24,
+    alignSelf: "center",
+    backgroundColor: theme.colors.surface.white,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: theme.borderRadius.sm,
+    overflow: "hidden",
+    marginBottom: theme.spacing.lg,
     position: "relative",
   },
   imageSlide: {
-    width: width,
-    height: 350,
+    width: width - 24,
+    height: "100%",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: theme.colors.surface.white,
   },
   productImage: {
-    width: width * 0.8,
-    height: 280,
-    borderRadius: theme.borderRadius.lg,
+    width: "100%",
+    height: "100%",
   },
   pagination: {
     flexDirection: "row",
